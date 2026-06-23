@@ -1,0 +1,25 @@
+# CDISC Training Project .gitignore
+
+# renv
+renv/library/
+renv/local/
+renv/staging/
+renv/python/
+renv/sandbox/
+.Rprofile
+
+# R artifacts
+.Rhistory
+.RData
+*.Rproj.user/
+*.Rproj
+
+# Output XPT files (generated, not source)
+*.xpt
+
+# Credentials
+.Renviron
+
+# Data (raw clinical data should not be committed)
+data/raw/*.sas7bdat
+data/raw/*.xpt

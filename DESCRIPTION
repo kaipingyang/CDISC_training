@@ -1,0 +1,26 @@
+Package: CDISCTraining
+Type: Project
+Title: CDISC SDTM and ADaM Training with Claude Code Skills
+Version: 0.1.0
+Authors@R: person("Kaiping", "Yang", role = c("aut", "cre"))
+Description: Training project teaching clinical data scientists to generate
+    SDTM and ADaM datasets using Claude Code skills backed by pharmaverse
+    packages (sdtm.oak, admiral).
+License: MIT
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.0
+Depends:
+    R (>= 4.2.0)
+Imports:
+    sdtm.oak,
+    admiral,
+    metacore,
+    metatools,
+    xportr,
+    dplyr,
+    tidyr,
+    stringr,
+    haven,
+    pharmaversesdtm,
+    pharmaverseadam
