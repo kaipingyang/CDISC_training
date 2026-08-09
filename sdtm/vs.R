@@ -10,6 +10,7 @@
 #   - sdtm.oak       : SDTM 映射核心工具包（Roche/pharmaverse）
 #   - pharmaverseraw : 提供示例原始数据
 #   - dplyr          : 数据操作
+#   - xportr         : 导出为 SAS 传输文件（.xpt）
 #
 # 输入数据来源：
 #   - pharmaverseraw::vs_raw   : 生命体征原始数据（含多个测量指标列）
@@ -17,7 +18,7 @@
 #   - metadata/sdtm_ct.csv     : CDISC 受控术语对照表
 #
 # 输出文件：
-#   - vs（R 对象，包含 VSTESTCD、VSORRES、VSSTRESC、VSSTRESN 等 SDTM 标准变量）
+#   - vs.xpt（SAS 传输文件，写入 tempdir()）
 #
 # 关键概念说明：
 #   VS 域采用"竖式"（tall/narrow）数据结构：每行一个测量指标，而非横式（每行一次访视）
@@ -31,6 +32,7 @@
 library(sdtm.oak)
 library(pharmaverseraw)
 library(dplyr)
+library(xportr)
 
 # Read in input data
 vs_raw <- pharmaverseraw::vs_raw
@@ -460,3 +462,9 @@ vs <- vs %>%
     study_day_var = "VSDY"
   ) %>%
   dplyr::select("STUDYID", "DOMAIN", "USUBJID", "VSSEQ", "VSTESTCD", "VSTEST", "VSPOS", "VSORRES", "VSORRESU", "VSSTRESC", "VSSTRESN", "VSSTRESU", "VSLOC", "VISITNUM", "VISIT", "VSDTC", "VSDY", "VSTPT", "VSTPTNUM", "VSELTM", "VSTPTREF")
+
+## ----r export--------------------------------------------------------------
+# 导出为 SAS 传输文件（.xpt），供下游 ADaM 或电子提交使用
+dir <- tempdir()
+vs %>%
+  xportr_write(file.path(dir, "vs.xpt"), domain = "VS")

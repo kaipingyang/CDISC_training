@@ -9,6 +9,7 @@
 #   - sdtm.oak       : SDTM 映射核心工具包（Roche/pharmaverse）
 #   - pharmaverseraw : 提供示例原始数据（模拟 EDC 采集数据）
 #   - dplyr          : 数据操作（管道、变量选择等）
+#   - xportr         : 导出为 SAS 传输文件（.xpt）
 #
 # 输入数据来源：
 #   - pharmaverseraw::ae_raw   : 不良事件原始数据（EDC 采集）
@@ -16,7 +17,7 @@
 #   - metadata/sdtm_ct.csv     : CDISC 受控术语对照表
 #
 # 输出文件：
-#   - ae（R 对象，包含 AESEQ、AETERM、AESTDTC、AEENDTC、AESTDY 等 SDTM 标准变量）
+#   - ae.xpt（SAS 传输文件，写入 tempdir()）
 #
 # 关键概念说明：
 #   AE 域是临床试验中最重要的安全性数据集之一
@@ -29,6 +30,7 @@
 library(sdtm.oak)
 library(pharmaverseraw)
 library(dplyr)
+library(xportr)
 
 # 读入原始不良事件数据和已映射的 DM 域（DM 提供 RFXSTDTC 等参照日期用于计算研究日）
 ae_raw <- pharmaverseraw::ae_raw
@@ -247,3 +249,9 @@ ae <- ae %>%
     "AEHLGTCD", "AEBODSYS", "AEBDSYCD", "AESOC", "AESOCCD", "AESEV", "AESER", "AEACN", "AEREL", "AEOUT", "AESCAN", "AESCONG",
     "AESDISAB", "AESDTH", "AESHOSP", "AESLIFE", "AESOD", "AEDTC", "AESTDTC", "AEENDTC", "AESTDY", "AEENDY"
   )
+
+## ----r export--------------------------------------------------------------
+# 导出为 SAS 传输文件（.xpt），供下游 ADaM 或电子提交使用
+dir <- tempdir()
+ae %>%
+  xportr_write(file.path(dir, "ae.xpt"), domain = "AE")

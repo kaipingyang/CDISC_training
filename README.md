@@ -10,6 +10,30 @@ CDISCPILOT01 内置示例数据。
 
 ---
 
+## 课程介绍
+
+### Claude Code 临床数据自动化开发
+
+**使用 Agent Skills 加速 SDTM、ADaM 与 TFL 开发**
+
+本课程介绍如何利用 **Claude Code 和 Agent Skills** 加速基于 R 的临床数据自动化开发，涵盖 SDTM、ADaM 和 TFL 等常见临床编程任务。课程结合实际临床数据案例，演示如何通过自然语言描述需求并调用专业 Skill，辅助完成需求分析、数据映射、变量派生、R 代码生成、程序解释和结果验证。
+
+课程重点讲解 Agent Skills 在标准化临床开发流程中的实际应用。学员将学习如何清晰地向 Claude Code 表达任务需求、正确使用预设 Skill，并结合项目规范检查和调整 AI 生成的程序。即使没有 R 编程经验，也可以在 Claude Code 的辅助下逐步理解代码逻辑和临床数据处理流程。
+
+完成课程后，学员能够使用 Claude Code 和 Agent Skills 辅助 SDTM、ADaM 与 TFL 开发，将重复性任务转化为更加高效、一致且可复用的自动化流程，从而提升临床数据开发的效率和质量。
+
+### Clinical Data Automation with Claude Code
+
+**Using Agent Skills to Accelerate SDTM, ADaM, and TFL Development**
+
+This course introduces how to use **Claude Code and Agent Skills** to accelerate R-based clinical data automation, covering common clinical programming tasks related to SDTM, ADaM, and TFL development. Through practical clinical data examples, participants will learn how to describe requirements in natural language and use specialized Skills to support requirement analysis, data mapping, variable derivation, R code generation, code interpretation, and result validation.
+
+The course focuses on the practical use of Agent Skills in standardized clinical development workflows. Participants will learn how to communicate requirements clearly to Claude Code, use predefined Skills effectively, and review and adjust AI-generated programs according to project specifications. Even without prior R programming experience, participants can use Claude Code to gradually understand the code logic and clinical data processing workflow.
+
+By the end of the course, participants will be able to use Claude Code and Agent Skills to support SDTM, ADaM, and TFL development, transforming repetitive tasks into more efficient, consistent, and reusable automated workflows while improving the quality and efficiency of clinical data development.
+
+---
+
 ## 环境要求
 
 - R >= 4.2.0

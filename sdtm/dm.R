@@ -9,6 +9,7 @@
 #   - sdtm.oak       : Roche/pharmaverse 开发的 SDTM 映射核心工具包
 #   - pharmaverseraw : 提供示例原始数据（模拟 EDC 采集数据）
 #   - dplyr          : 数据操作（管道、变量选择等）
+#   - xportr         : 导出为 SAS 传输文件（.xpt）
 #
 # 输入数据来源：
 #   - pharmaverseraw::dm_raw  : 受试者基本信息原始数据
@@ -17,7 +18,7 @@
 #   - metadata/sdtm_ct.csv    : CDISC 受控术语对照表
 #
 # 输出文件：
-#   - dm（R 对象，可进一步导出为 dm.xpt SAS 传输文件）
+#   - dm.xpt（SAS 传输文件，写入 tempdir()）
 #
 # 关键概念说明（给不熟悉R的临床数据人员）：
 #   SDTM 映射：把 EDC 收集的原始变量名，按 CDISC 规定重命名并转换成标准格式
@@ -30,6 +31,7 @@
 library(sdtm.oak)
 library(pharmaverseraw)
 library(dplyr)
+library(xportr)
 
 # 读入原始数据：来自 pharmaverseraw 包（模拟 EDC 系统导出的原始数据）
 dm_raw <- pharmaverseraw::dm_raw
@@ -290,4 +292,16 @@ dm <- dm %>%
     tgdt = "DMDTC",
     refdt = "RFXSTDTC",
     study_day_var = "DMDY"
+  ) %>%
+  # 按 SDTM DM 域变量列表筛选输出变量，剔除 oak_id/raw_source/patient_number 等内部追踪列
+  select(
+    "STUDYID", "DOMAIN", "USUBJID", "SUBJID", "RFSTDTC", "RFENDTC", "RFXSTDTC", "RFXENDTC",
+    "RFICDTC", "RFPENDTC", "DTHDTC", "DTHFL", "SEX", "AGE", "AGEU", "RACE", "ETHNIC",
+    "ARMCD", "ARM", "ACTARMCD", "ACTARM", "COUNTRY", "DMDTC", "DMDY"
   )
+
+## ----r export--------------------------------------------------------------
+# 导出为 SAS 传输文件（.xpt），供下游 ADaM 或电子提交使用
+dir <- tempdir()
+dm %>%
+  xportr_write(file.path(dir, "dm.xpt"), domain = "DM")

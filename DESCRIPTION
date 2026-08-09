@@ -15,12 +15,16 @@ Depends:
 Imports:
     sdtm.oak,
     admiral,
+    admiralonco,
     metacore,
     metatools,
     xportr,
     dplyr,
     tidyr,
     stringr,
+    lubridate,
     haven,
+    reactable,
+    pharmaverseraw,
     pharmaversesdtm,
     pharmaverseadam
