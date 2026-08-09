@@ -25,6 +25,10 @@ Imports:
     lubridate,
     haven,
     reactable,
+    rtables,
+    tern,
+    rlistings,
+    ggplot2,
     pharmaverseraw,
     pharmaversesdtm,
     pharmaverseadam

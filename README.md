@@ -105,6 +105,39 @@ source("adam/adtte.R")  # ADTTE（生存分析数据集）
 
 ---
 
+### 第四步：生成 TFL（表格 / 图形 / 列表）
+
+TFL（Tables/Figures/Listings）是临床研究报告的最终交付物，建立在 ADaM 分析数据集之上，
+使用 pharmaverse 官方 TLG 技术栈（`tern` + `rtables`）生成。
+
+**方式一：直接运行参考脚本**
+
+```r
+source("tfl/t_demographic.R")      # 人口学特征表（入门主线，ADSL 单表）
+source("tfl/t_adverse_events.R")   # AE 汇总表（ADAE + ADSL，含分母逻辑）
+source("tfl/g_km.R")               # KM 生存曲线图（ADTTE）
+```
+
+> 三个示例难度递增：人口学表 → AE 表 → KM 图，覆盖"表"与"图"两大类。
+> 表格导出为文本文件，图形导出为 PNG（均写入临时目录 `tempdir()`）。
+
+**方式二：在 Claude Code 中用自然语言触发 `tfl` skill**
+
+> "帮我做一张人口学特征表，按治疗组分列"
+> "生成 AE 汇总表，按 SOC 和 PT 统计发生率"
+> "画一张总生存期 OS 的 KM 生存曲线"
+> "create a demographic table from ADSL"
+
+> **技术栈说明**：`rtables` 是底层布局引擎，`tern` 是基于它的临床高层封装（学员主要调 tern）。
+> 核心心智模型是"Layout 与 Data 分离"——先声明表长什么样，再喂数据。
+> 遇到没见过的表格类型，可查官方 [TLG Catalog](https://insightsengineering.github.io/tlg-catalog/stable/)（数百个即用示例）。
+
+> **关于交互展示（teal）**：分析数据集和 TFL 都有了之后，若需要交互式探索（动态筛选、
+> 切换参数），可了解 pharmaverse 的 `teal` 框架——它把 TFL 输出包装成 Shiny 交互应用。
+> 这属于 Shiny/teal 的进阶主题，本项目不展开。
+
+---
+
 ## 项目结构
 
 ```
@@ -124,6 +157,10 @@ CDISC_training/
 │   ├── adae.R               # ADAE：不良事件分析数据集
 │   ├── advs.R               # ADVS：生命体征分析数据集
 │   └── adtte.R              # ADTTE：生存分析数据集
+├── tfl/
+│   ├── t_demographic.R      # 人口学特征表（tern/rtables）
+│   ├── t_adverse_events.R   # AE 汇总表（含 alt_counts_df 分母）
+│   └── g_km.R               # KM 生存曲线图（tern g_km）
 └── data/
     └── raw/                 # 原始数据目录（示例数据来自 pharmaverseraw 包）
 ```
@@ -139,14 +176,19 @@ CDISC_training/
 | `metacore` | 规格/元数据管理，读取变量级规格表 |
 | `metatools` | 数据集验证工具，配合 metacore 使用 |
 | `xportr` | 导出 SAS 传输格式（.xpt）文件，供电子提交使用 |
+| `rtables` | TFL 表格布局引擎，提供 `basic_table`/`build_table` 等 |
+| `tern` | 基于 rtables 的临床分析高层封装，提供 `analyze_vars`/`count_occurrences`/`g_km` 等 |
+| `rlistings` | 病人级列表（Listing）生成 |
 | `pharmaverseraw` | SDTM 映射用原始数据（EDC 模拟数据，CDISCPILOT01 研究） |
 | `pharmaversesdtm` | SDTM 标准域数据（供 ADaM 脚本作为输入使用） |
-| `pharmaverseadam` | ADaM 参考数据集（用于对比验证输出结果） |
+| `pharmaverseadam` | ADaM 参考数据集（供 TFL 脚本作为输入 / 对比验证） |
 
 ---
 
-## Phase 2 路线图
+## 路线图
 
-Phase 2 计划扩展更多 SDTM 域（LB、CM、MH、DS 等）和 ADaM 数据集（ADLB、ADCM），
-并完善从原始数据到 XPT 文件导出的完整电子提交流程，包括 define.xml 生成、
-Pinnacle 21 合规验证，以及与 Posit Connect 部署的自动化管道。
+已完成：SDTM 映射（sdtm.oak）→ ADaM 派生（admiral）→ TFL 生成（tern/rtables）完整生产链，
+配套 `sdtm` / `adam` / `tfl` 三个 Claude Code skill。
+
+后续可扩展：更多 SDTM 域（LB、CM、MH、DS 等）和 ADaM 数据集，完善电子提交流程
+（define.xml 生成、Pinnacle 21 合规验证），以及 teal 交互式展示应用。
