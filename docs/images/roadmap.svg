@@ -1,0 +1,58 @@
+<svg viewBox="0 0 1400 240" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, 'SF Pro Display', 'PingFang SC', sans-serif" role="img" aria-label="CDISC 数据流水线：原始数据到 SDTM 到 ADaM 到 TFL">
+  <defs>
+    <linearGradient id="gRaw" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#34C759"/><stop offset="1" stop-color="#30B0C7"/>
+    </linearGradient>
+    <linearGradient id="gSdtm" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#007AFF"/><stop offset="1" stop-color="#5AC8FA"/>
+    </linearGradient>
+    <linearGradient id="gAdam" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5856D6"/><stop offset="1" stop-color="#007AFF"/>
+    </linearGradient>
+    <linearGradient id="gTfl" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#AF52DE"/><stop offset="1" stop-color="#5856D6"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#000" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+
+  <!-- 卡片 4 段 -->
+  <g filter="url(#shadow)">
+    <rect x="40"   y="60" width="270" height="120" rx="22" fill="url(#gRaw)"/>
+    <rect x="416"  y="60" width="270" height="120" rx="22" fill="url(#gSdtm)"/>
+    <rect x="792"  y="60" width="270" height="120" rx="22" fill="url(#gAdam)"/>
+    <rect x="1168" y="60" width="192" height="120" rx="22" fill="url(#gTfl)"/>
+  </g>
+
+  <!-- 标题 + 包名 -->
+  <g fill="#FFFFFF" text-anchor="middle">
+    <text x="175"  y="112" font-size="34" font-weight="800">Raw Data</text>
+    <text x="175"  y="150" font-size="19" opacity="0.92">pharmaverseraw</text>
+    <text x="551"  y="112" font-size="34" font-weight="800">SDTM</text>
+    <text x="551"  y="150" font-size="19" opacity="0.92">sdtm.oak</text>
+    <text x="927"  y="112" font-size="34" font-weight="800">ADaM</text>
+    <text x="927"  y="150" font-size="19" opacity="0.92">admiral</text>
+    <text x="1264" y="112" font-size="34" font-weight="800">TFL</text>
+    <text x="1264" y="150" font-size="19" opacity="0.92">tern · rtables</text>
+  </g>
+
+  <!-- 箭头 -->
+  <g fill="#8E8E93">
+    <path d="M320 120 L406 120" stroke="#8E8E93" stroke-width="5" marker-end="url(#arrow)"/>
+    <path d="M696 120 L782 120" stroke="#8E8E93" stroke-width="5" marker-end="url(#arrow)"/>
+    <path d="M1072 120 L1158 120" stroke="#8E8E93" stroke-width="5" marker-end="url(#arrow)"/>
+  </g>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#8E8E93"/>
+    </marker>
+  </defs>
+
+  <!-- 底部 skill 标注 -->
+  <g fill="#8E8E93" text-anchor="middle" font-size="17" font-style="italic">
+    <text x="551"  y="212">skill: sdtm</text>
+    <text x="927"  y="212">skill: adam</text>
+    <text x="1264" y="212">skill: tfl</text>
+  </g>
+</svg>
