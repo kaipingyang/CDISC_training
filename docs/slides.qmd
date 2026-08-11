@@ -1,0 +1,265 @@
+---
+title: "CDISC 数据集生成实战"
+subtitle: "用 Claude Code + skill 从原始数据到 SDTM / ADaM / TFL"
+author: ""
+date: today
+format:
+  revealjs:
+    theme: default
+    slide-number: c/t
+    code-line-numbers: true
+    highlight-style: arrow
+    width: 1600
+    height: 900
+    transition: fade
+    transition-speed: fast
+    code-block-height: 560px
+    footer: "CDISC 数据集生成实战 · pharmaverse · Claude Code"
+execute:
+  echo: true
+  eval: false
+lang: zh
+---
+
+## 今天的旅程 {.center}
+
+**目标**：不用从零学 R，用 **Claude Code + skill**，用自然语言驱动生成符合 CDISC 规范的临床数据集。
+
+**贯穿主线**：同一份 CDISCPILOT01 示例数据，走完整条流水线
+
+```
+原始数据(Raw)  →  SDTM  →  ADaM  →  TFL
+ pharmaverseraw   sdtm.oak  admiral  tern/rtables
+```
+
+**两个课时**：
+
+- **课时 1**：Claude Code 基础 + 用 skill 生成 **SDTM**
+- **课时 2**：用 skill 生成 **ADaM** + **TFL**（表格/图形）
+
+## 我们用什么工具
+
+| 工具 | 用途 |
+|------|------|
+| **Claude Code** | 终端里的 AI 编程助手，用中文对话驱动写代码 |
+| **skill** | 本项目内置的领域技能包，自动按 CDISC 规范生成代码 |
+| **pharmaverse** | 开源临床数据生态（sdtm.oak / admiral / tern） |
+| **CDISCPILOT01** | pharmaverse 内置的公开示例研究数据 |
+
+::: {.callout-note}
+本项目内置 **6 个 skill**：`sdtm`、`sdtm-map`、`adam`、`adam-derive`、`admiral-adsl`、`admiral-bds`、`tfl`。
+在 Claude Code 里用自然语言描述需求，对应 skill 自动加载，按 CDISC 标准生成可运行代码。
+:::
+
+## Claude Code 怎么用 {.center}
+
+**三件事就够上手**：
+
+1. **对话驱动** —— 直接用中文说要干什么，AI 读代码、改代码、跑代码
+2. **skill 触发** —— 说到领域关键词（如"生成 AE 域"），对应 skill 自动加载
+3. **文件读写** —— AI 直接在项目里创建/修改 `.R` 脚本，你审阅后运行
+
+::: {.callout-tip}
+你不需要记 R 语法。你需要的是**说清楚要什么**（哪个域、什么变量、什么规则），
+再**看懂 AI 生成的代码在做什么**（有中文注释引导）。
+:::
+
+# 课时 1：用 skill 生成 SDTM {.center}
+
+*Claude Code 基础 + SDTM 映射 · 60 分钟*
+
+## 什么是 SDTM
+
+**SDTM**（Study Data Tabulation Model）：把 EDC 采集的**原始数据**，
+按 CDISC 规定**重命名、标准化**成监管提交用的规范格式。
+
+- 数据按**域（Domain）**组织：DM（人口学）、AE（不良事件）、VS（生命体征）……
+- **受控术语（CT）**：把原始值映射成标准值（如"男"→"M"、"Mild Adverse Event"→"MILD"）
+
+**三种映射动作**（sdtm.oak 提供）：
+
+| 函数 | 作用 |
+|------|------|
+| `assign_no_ct` | 原样复制原始值到目标变量 |
+| `assign_ct` | 按受控术语表转换（如严重程度 → MILD/MODERATE/SEVERE） |
+| `hardcode_ct` | 写入固定常量（如年龄单位统一为 "YEARS"） |
+
+## 主线演示：生成 AE 域
+
+**在 Claude Code 里，你只需要说**：
+
+> "帮我用 sdtm.oak 生成 AE 域的映射代码，原始数据是 pharmaverseraw 的 ae_raw"
+
+`sdtm-map` skill 自动加载（触发词：`AE域`、`生成SDTM`、`sdtm.oak`），生成映射脚本。
+
+**skill 生成的关键片段**（受控术语转换）：
+
+```r
+ae <- ae %>%
+  # 映射不良事件结局 AEOUT（按 CT 表转换）
+  assign_ct(
+    raw_dat = ae_raw, raw_var = "AEOUTCOME", tgt_var = "AEOUT",
+    ct_spec = study_ct, ct_clst = "C66768",
+    id_vars = oak_id_vars()
+  ) %>%
+  # 映射严重程度 AESEV
+  assign_ct(
+    raw_dat = ae_raw, raw_var = "IT.AESEV", tgt_var = "AESEV",
+    ct_spec = study_ct, ct_clst = "C66769",
+    id_vars = oak_id_vars()
+  )
+```
+
+## 运行与产物
+
+**运行脚本**：
+
+```r
+source("sdtm/ae.R")   # 生成 AE 域，导出 ae.xpt
+```
+
+**产物**：符合 SDTM 规范的 AE 数据集（含 STUDYID/USUBJID/AESEQ/AETERM/AESEV/AEOUT…），
+导出为 `ae.xpt`（SAS 传输文件，供电子提交）。
+
+::: {.callout-note}
+项目里 `sdtm/ae.R`、`sdtm/dm.R`、`sdtm/vs.R` 都是这样生成的完整参考脚本，
+已实测可运行。DM/VS 用法与 AE 完全一样，可作为你的练习模板。
+:::
+
+## 课时 1 小结
+
+- **Claude Code**：中文对话驱动，skill 自动加载
+- **sdtm / sdtm-map skill**：回答 SDTM 结构问题 + 生成映射代码
+- **三种映射动作**：assign_no_ct / assign_ct / hardcode_ct
+- **产物**：AE.xpt / DM.xpt / VS.xpt
+
+**练习**：用同样方式生成 DM 域和 VS 域。
+
+# 课时 2：用 skill 生成 ADaM + TFL {.center}
+
+*分析数据集 + 表格图形 · 60 分钟*
+
+## 什么是 ADaM
+
+**ADaM**（Analysis Data Model）：在 SDTM 基础上进一步加工成**可直接统计分析**的数据集。
+
+- **ADSL** —— 受试者级数据集（每人一行），所有 ADaM 的基础
+- **两种结构**：
+  - **BDS**（Basic Data Structure）：参数化长表，如 ADVS/ADLB/ADTTE
+  - **OCCDS**（Occurrence Data Structure）：发生类事件，如 ADAE/ADCM
+
+**admiral** 提供 `derive_*` 系列派生函数，一个函数做一件事，串成管道。
+
+## 主线演示：生成 ADSL → ADAE
+
+**先建 ADSL**（说）：
+
+> "用 admiral 帮我创建 ADSL，从 pharmaverse 的 DM 和 EX 域派生治疗日期"
+
+`admiral-adsl` skill 加载，生成受试者级数据集（治疗组、人口学、治疗起止日期、人群标志）。
+
+**再建 ADAE**（说）：
+
+> "生成 ADAE，需要标记 TRTEMFL（治疗期间不良事件标志）"
+
+```r
+adae <- ae %>%
+  derive_vars_merged(          # 从 ADSL 合并治疗日期
+    dataset_add = adsl,
+    new_vars = exprs(TRTSDT, TRTEDT),
+    by_vars = exprs(STUDYID, USUBJID)
+  ) %>%
+  derive_vars_dt(new_vars_prefix = "AST", dtc = AESTDTC) %>%
+  derive_var_trtemfl(new_var = TRTEMFL, ...)  # 标记 TEAE
+```
+
+## 从 ADaM 到 TFL
+
+**TFL**（Tables / Figures / Listings）：临床报告的最终交付物，建立在 ADaM 之上。
+
+**技术栈**：`rtables`（布局引擎）+ `tern`（临床高层封装，主要调这层）
+
+**核心心智模型**：**Layout 与 Data 分离** —— 先声明"表长什么样"，再喂数据。
+
+```r
+# ① 定义布局（还没有数据）
+lyt <- basic_table(show_colcounts = TRUE) %>%
+  split_cols_by("ACTARM") %>%              # 按治疗组分列
+  add_overall_col("All Patients") %>%      # 加合计列
+  analyze_vars(vars = c("AGE", "SEX", "RACE"))
+
+# ② 喂数据，生成表
+tbl <- build_table(lyt, df = adsl)
+```
+
+## TFL 三个示例
+
+**说一句话，`tfl` skill 生成对应代码**：
+
+| 你说 | 生成 | 难度 |
+|------|------|------|
+| "做人口学特征表，按治疗组分列" | `t_demographic.R` | 入门（ADSL 单表） |
+| "AE 汇总表，按 SOC 和 PT 统计发生率" | `t_adverse_events.R` | 中级（ADAE+ADSL 分母） |
+| "画总生存期 OS 的 KM 生存曲线" | `g_km.R` | 进阶（表→图） |
+
+::: {.callout-important}
+**AE 表分母口诀**：分子看 ADAE（发生数），分母看 ADSL（总人数）。
+ADAE 里只有发生过 AE 的人，没发生的不在里面 —— 分母必须用 `alt_counts_df = adsl`。
+:::
+
+## 人口学表长这样
+
+```
+                          Placebo    Xan High    Xan Low   All Patients
+                          (N=86)      (N=72)     (N=96)      (N=254)
+———————————————————————————————————————————————————————————————————————
+AGE
+  Mean (SD)             75.2 (8.6)  73.8 (7.9) 76.0 (8.1)  75.1 (8.2)
+  Median                  76.0        75.5       78.0        77.0
+SEX
+  Female                53 (61.6%)  35 (48.6%) 55 (57.3%) 143 (56.3%)
+  Male                  33 (38.4%)  37 (51.4%) 41 (42.7%) 111 (43.7%)
+```
+
+**一段 layout + `build_table()`，就出这张规范表** —— tern 自动算好统计量和百分比。
+
+## 完整链条回顾 {.center}
+
+```
+原始数据      SDTM        ADaM         TFL
+─────────    ────────    ─────────    ──────────
+pharmaverseraw           pharmaverseadam
+   │           │            │            │
+ ae_raw  →  sdtm/ae.R  → adam/adae.R → tfl/t_adverse_events.R
+   │           │            │            │
+ dm_raw  →  sdtm/dm.R  → adam/adsl.R → tfl/t_demographic.R
+                            │            │
+                        adam/adtte.R → tfl/g_km.R
+```
+
+**每一段都有对应 skill**：`sdtm` → `adam` → `tfl`，全程中文对话驱动。
+
+## 下一步：交互展示
+
+数据和 TFL 都有了 —— 想让它们**可交互探索**（动态筛选、切换参数）？
+
+**pharmaverse 的 `teal` 框架**：把 tern/rtables 的输出包装成 Shiny 交互应用。
+
+::: {.callout-note}
+teal 交互展示属于 **Shiny 进阶主题**，是另一场培训（shiny_training）的内容，本次不展开。
+本次培训到"生成分析就绪的数据 + 静态 TFL"为止 —— 这已是电子提交的核心产出。
+:::
+
+## 谢谢 {.center}
+
+**项目仓库**：https://github.com/kaipingyang/CDISC_training
+
+**跟着做**：
+```r
+renv::restore()          # 恢复环境
+source("sdtm/ae.R")      # SDTM
+source("adam/adsl.R")    # ADaM
+source("tfl/t_demographic.R")  # TFL
+```
+
+**或者，直接在 Claude Code 里用中文说出你要的数据集。**

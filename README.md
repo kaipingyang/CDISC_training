@@ -161,9 +161,32 @@ CDISC_training/
 │   ├── t_demographic.R      # 人口学特征表（tern/rtables）
 │   ├── t_adverse_events.R   # AE 汇总表（含 alt_counts_df 分母）
 │   └── g_km.R               # KM 生存曲线图（tern g_km）
+├── docs/
+│   ├── slides.qmd           # 讲师幻灯片（Quarto revealjs，两课时）
+│   └── tutorial.qmd         # 学员自学手册（Quarto html）
 └── data/
     └── raw/                 # 原始数据目录（示例数据来自 pharmaverseraw 包）
 ```
+
+---
+
+## 培训材料
+
+`docs/` 下有两份 Quarto 培训材料（两课时：课时1 SDTM，课时2 ADaM+TFL）：
+
+| 文件 | 用途 |
+|------|------|
+| `docs/slides.qmd` | 讲师用幻灯片（revealjs） |
+| `docs/tutorial.qmd` | 学员自学手册（可跟做的完整步骤 + 常见问题） |
+
+渲染为 HTML（需已安装 [Quarto](https://quarto.org/)）：
+
+```bash
+quarto render docs/slides.qmd     # 生成 docs/slides.html
+quarto render docs/tutorial.qmd   # 生成 docs/tutorial.html
+```
+
+> 渲染产物（`*.html`、`*_files/`）已在 `.gitignore` 中排除，仓库只保留 `.qmd` 源文件。
 
 ---
 

@@ -23,3 +23,8 @@ renv/sandbox/
 # Data (raw clinical data should not be committed)
 data/raw/*.sas7bdat
 data/raw/*.xpt
+
+# Quarto render outputs (only commit .qmd source)
+docs/*.html
+docs/*_files/
+.quarto/
