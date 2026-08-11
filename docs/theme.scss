@@ -1,0 +1,341 @@
+/*-- scss:defaults --*/
+
+/* iOS / Apple HIG 明亮色系：SF Pro 字体、白色卡片、系统蓝/紫渐变 */
+
+// 背景 & 文字（明亮模式）
+$body-bg: #F2F2F7;
+$body-color: #1C1C1E;
+$link-color: #007AFF;
+$selection-bg: rgba(0,122,255,0.15);
+
+// SF Pro 字体栈
+$font-family-sans-serif: -apple-system, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "PingFang SC", "Noto Sans SC", sans-serif;
+$font-family-monospace: "SF Mono", "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+
+$presentation-font-size-root: 34px;
+$presentation-heading-font: -apple-system, "SF Pro Display", "Helvetica Neue", "PingFang SC", sans-serif;
+$presentation-heading-color: #1C1C1E;
+$presentation-heading-font-weight: 700;
+
+$presentation-h1-font-size: 1.85em;
+$presentation-h2-font-size: 1.25em;
+$presentation-h3-font-size: 1.0em;
+
+// 代码块（浅色）
+$code-block-bg: #FFFFFF;
+$code-block-border-color: rgba(0,0,0,0.08);
+$code-block-font-size: 0.76em;
+$code-color: #1C1C1E;
+
+$presentation-block-margin: 12px;
+
+/*-- scss:rules --*/
+
+/* 全局背景：iOS 浅灰 */
+.reveal {
+  background: #F2F2F7;
+}
+
+.reveal .slide-background-content {
+  background: #F2F2F7;
+}
+
+/* ── 标题幻灯片 ── */
+.reveal .slides section.title-slide {
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.reveal .slides section.title-slide .title {
+  font-size: 1.95em;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #007AFF 0%, #5856D6 50%, #AF52DE 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  padding-bottom: 0.15em;
+}
+
+.reveal .slides section.title-slide .subtitle {
+  font-size: 1.05em;
+  color: rgba(60,60,67,0.6);
+  font-weight: 400;
+}
+
+.reveal .slides section.title-slide .date {
+  font-size: 0.8em;
+  color: rgba(60,60,67,0.4);
+  letter-spacing: 0.04em;
+}
+
+/* ── 章节标题幻灯片 ── */
+.reveal .slides section.center h1 {
+  font-size: 2.1em;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #007AFF 0%, #5856D6 60%, #AF52DE 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.reveal .slides section.center > p {
+  color: rgba(60,60,67,0.5);
+  font-size: 0.9em;
+  font-style: italic;
+}
+
+/* ── 普通幻灯片 h2 ── */
+.reveal .slides section h2 {
+  font-size: 1.25em;
+  font-weight: 700;
+  color: #1C1C1E;
+  letter-spacing: -0.015em;
+  border-bottom: 1.5px solid rgba(0,0,0,0.07);
+  padding-bottom: 0.12em;
+  margin-bottom: 0.55em;
+}
+
+/* ── 正文 ── */
+.reveal .slides p,
+.reveal .slides li {
+  color: #3A3A3C;
+  line-height: 1.55;
+}
+
+/* ── 强调 ── */
+.reveal .slides strong {
+  color: #1C1C1E;
+  font-weight: 700;
+}
+
+/* ── 行内代码 ── */
+.reveal .slides code:not(.sourceCode) {
+  background: rgba(0,122,255,0.08);
+  color: #007AFF;
+  padding: 0.06em 0.38em;
+  border-radius: 6px;
+  font-size: 0.82em;
+  border: 1px solid rgba(0,122,255,0.15);
+  font-family: "SF Mono", "JetBrains Mono", monospace;
+}
+
+/* ── 代码块：白色卡片 ── */
+.reveal div.sourceCode {
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: #FFFFFF !important;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04);
+  overflow: hidden;
+}
+
+.reveal div.sourceCode pre {
+  padding: 0.9em 1.1em;
+  margin: 0;
+  background: #FFFFFF !important;
+}
+
+/* ── 表格：iOS 卡片风格 ── */
+.reveal .slides table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  font-size: 0.82em;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  background: #FFFFFF;
+}
+
+.reveal .slides table thead tr {
+  background: linear-gradient(135deg, rgba(0,122,255,0.08), rgba(88,86,214,0.08));
+}
+
+.reveal .slides table tbody tr:nth-child(even) {
+  background: rgba(0,0,0,0.02);
+}
+
+.reveal .slides table td,
+.reveal .slides table th {
+  padding: 0.5em 0.85em;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  color: #3A3A3C;
+}
+
+.reveal .slides table thead th {
+  color: #1C1C1E;
+  font-weight: 700;
+  border-bottom: 1.5px solid rgba(0,122,255,0.2);
+}
+
+/* ── Callout 框 ── */
+.reveal .callout {
+  border-radius: 12px;
+  margin: 0.55em 0;
+  font-size: 0.81em;
+  border: none !important;
+  padding: 0.75em 1em;
+}
+
+.reveal .callout-tip {
+  background: rgba(52,199,89,0.09);
+  border-left: 3px solid #34C759 !important;
+}
+
+.reveal .callout-warning {
+  background: rgba(255,149,0,0.09);
+  border-left: 3px solid #FF9500 !important;
+}
+
+.reveal .callout-important {
+  background: rgba(255,59,48,0.09);
+  border-left: 3px solid #FF3B30 !important;
+}
+
+.reveal .callout-note {
+  background: rgba(0,122,255,0.09);
+  border-left: 3px solid #007AFF !important;
+}
+
+/* ── 列表标记 ── */
+.reveal .slides li::marker {
+  color: #007AFF;
+}
+
+/* ── 进度条 ── */
+.reveal .progress {
+  height: 2px;
+  background: linear-gradient(90deg, #007AFF, #5856D6, #AF52DE);
+}
+
+/* ── 幻灯片编号 ── */
+.reveal .slide-number {
+  color: rgba(60,60,67,0.4);
+  background: rgba(0,0,0,0.05);
+  font-size: 0.63em;
+  border-radius: 8px;
+  padding: 0.2em 0.5em;
+}
+
+/* ── Footer ── */
+.reveal .footer {
+  color: rgba(60,60,67,0.4);
+  font-size: 0.62em;
+  letter-spacing: 0.03em;
+}
+
+/* ── 双栏：强制 flex 并排 ── */
+.reveal .columns {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 1.2em;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.reveal .columns .column {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0 0.3em;
+}
+
+/* ── 代码块：现代感升级 ── */
+/* 载入 JetBrains Mono（Google Fonts 版） */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
+.reveal div.sourceCode {
+  border-radius: 14px;
+  border: none;
+  background: #F8F9FC !important;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.06),
+    0 4px 20px rgba(0,0,0,0.08),
+    0 1px 3px rgba(0,0,0,0.04);
+  overflow: hidden;
+  position: relative;
+}
+
+/* macOS 红绿蓝三点装饰 */
+.reveal div.sourceCode::before {
+  content: '';
+  display: block;
+  height: 32px;
+  background: linear-gradient(180deg, #EDEDEE 0%, #E5E5E6 100%);
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+  background-image: radial-gradient(circle 5px at 16px 50%, #FF5F57 0%, #FF5F57 100%),
+                    radial-gradient(circle 5px at 34px 50%, #FEBC2E 0%, #FEBC2E 100%),
+                    radial-gradient(circle 5px at 52px 50%, #28C840 0%, #28C840 100%);
+  background-repeat: no-repeat;
+}
+
+.reveal div.sourceCode pre {
+  padding: 0.85em 1.1em 0.9em;
+  margin: 0;
+  background: #F8F9FC !important;
+  max-height: 720px;
+  overflow: auto;
+}
+
+/* ── 代码字体 ── */
+.reveal pre code,
+.reveal div.sourceCode code {
+  font-family: "JetBrains Mono", "SF Mono", "Fira Code", ui-monospace, monospace !important;
+  font-size: 0.6em;
+  line-height: 1.5;
+  font-variant-ligatures: common-ligatures;
+  -webkit-font-feature-settings: "liga" 1, "calt" 1;
+  font-feature-settings: "liga" 1, "calt" 1;
+}
+
+/* ── 章节幻灯片背景装饰 ── */
+.reveal .slides section.center {
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+/* ── 装饰性顶部光带（标题幻灯片） ── */
+.reveal .slides section.title-slide::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #007AFF, #5856D6, #AF52DE);
+  border-radius: 0;
+}
+
+/* ── iOS 毛玻璃：环境光球 + backdrop-blur 玻璃卡（追加段） ── */
+.reveal .slide-background-content,
+.reveal .slide-background,
+.reveal {
+  background:
+    radial-gradient(circle at 14% 18%, rgba(0,122,255,0.30), transparent 38%),
+    radial-gradient(circle at 86% 14%, rgba(175,82,222,0.24), transparent 40%),
+    radial-gradient(circle at 78% 86%, rgba(88,86,214,0.22), transparent 44%),
+    radial-gradient(circle at 18% 82%, rgba(52,199,89,0.20), transparent 40%),
+    #F2F2F7 !important;
+}
+/* 玻璃卡：代码块、callout、引用、表格 */
+.reveal div.sourceCode,
+.reveal .callout,
+.reveal blockquote,
+.reveal .slides table {
+  background: rgba(255,255,255,0.55) !important;
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.65) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.10) !important;
+}
+.reveal .slides table thead tr {
+  background: rgba(0,122,255,0.18) !important;
+  backdrop-filter: blur(8px);
+}

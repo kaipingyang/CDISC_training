@@ -5,7 +5,7 @@ author: ""
 date: today
 format:
   revealjs:
-    theme: default
+    theme: [default, theme.scss]
     slide-number: c/t
     code-line-numbers: true
     highlight-style: arrow
