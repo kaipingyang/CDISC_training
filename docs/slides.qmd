@@ -8,6 +8,7 @@ format:
     theme: [default, theme.scss]
     slide-number: c/t
     navigation-mode: linear
+    embed-resources: true
     code-line-numbers: true
     highlight-style: arrow
     width: 1600
@@ -22,13 +23,13 @@ execute:
 lang: zh
 ---
 
-## 今天的旅程 {.center}
+## 今天的旅程
 
 **目标**：不用从零学 R，用 **Claude Code + skill**，用自然语言驱动生成符合 CDISC 规范的临床数据集。
 
-![](images/roadmap.svg){width="92%" fig-alt="从原始数据到 SDTM 到 ADaM 到 TFL 的流水线"}
+![](images/roadmap.svg){width="80%" fig-align="center" fig-alt="从原始数据到 SDTM 到 ADaM 到 TFL 的流水线"}
 
-**两个课时**：课时 1 = Claude Code 基础 + 生成 **SDTM**；课时 2 = 生成 **ADaM** + **TFL**
+**两个课时**：课时 1 = Claude Code 上手 + 生成 **SDTM**；课时 2 = 生成 **ADaM** + **TFL**
 
 ## 我们用什么工具
 
@@ -44,22 +45,40 @@ lang: zh
 用自然语言描述需求，对应 skill 自动加载，按 CDISC 标准生成可运行代码。
 :::
 
-## Claude Code 怎么用 {.center}
+# 课时 1：用 Claude Code 生成 SDTM {.center}
 
-**三件事就够上手**：
+*Claude Code 上手 + SDTM 映射 · 60 分钟*
 
-1. **对话驱动** —— 直接用中文说要干什么，AI 读代码、改代码、跑代码
-2. **skill 触发** —— 说到领域关键词（如"生成 AE 域"），对应 skill 自动加载
-3. **文件读写** —— AI 直接在项目里创建/修改 `.R` 脚本，你审阅后运行
+## 先学会用 Claude Code
+
+**Claude Code**：终端里的 AI 编程助手。你用中文说需求，它读代码、写代码、跑代码、看报错再改。
+
+**不懂 R 也能上手，三件事**：
+
+1. **对话驱动** —— 直接用中文说要干什么，AI 生成/修改 `.R` 脚本，你审阅后运行
+2. **skill 触发** —— 说到领域关键词（如"生成 AE 域"），对应 skill 自动加载，按 CDISC 规范写代码
+3. **看懂 + 迭代** —— AI 生成的代码有中文注释；不满意就继续说"把 X 改成 Y"
 
 ::: {.callout-tip}
-你不需要记 R 语法。你需要的是**说清楚要什么**（哪个域、什么变量、什么规则），
-再**看懂 AI 生成的代码在做什么**（有中文注释引导）。
+你不用记 R 语法。你要做的是**说清楚要什么**（哪个域、什么变量、什么规则），
+再**看懂 AI 在做什么**，让它反复改到对。
 :::
 
-# 课时 1：用 skill 生成 SDTM {.center}
+## Claude Code 五个实用动作
 
-*Claude Code 基础 + SDTM 映射 · 60 分钟*
+课时里你会反复用到这五个动作：
+
+| 动作 | 你怎么说 | 场景 |
+|------|---------|------|
+| **① 对话生成** | "帮我生成 AE 域的 SDTM 映射代码" | 从零起一个脚本 |
+| **② 显式喊 skill** | "用 sdtm-map skill 做 VS 域" | 关键词没自动触发时 |
+| **③ 文件引用** | "参考 `sdtm/ae.R` 帮我写 `vs.R`" | 让 AI 照已有脚本仿写 |
+| **④ 迭代修改** | "把导出路径改成 tempdir()" | 生成后继续调 |
+| **⑤ 解释 + 排错** | "解释这段 `assign_ct`" / "跑报错了，帮我修" | 看懂代码、AI 读报错自动 debug |
+
+::: {.callout-note}
+本课时全程只用这五个动作 —— 不用手写 R，不碰 MCP/hooks 等进阶功能。
+:::
 
 ## 什么是 SDTM
 
@@ -156,14 +175,14 @@ dm <- dm_raw %>%
 
 ## 课时 1 小结
 
-- **Claude Code**：中文对话驱动，skill 自动加载
+- **Claude Code 五个动作**：对话生成 / 喊 skill / 文件引用 / 迭代改 / 解释排错
 - **sdtm / sdtm-map skill**：回答 SDTM 结构问题 + 生成映射代码
 - **三种映射动作**：`assign_no_ct` / `assign_ct` / `hardcode_ct`
 - **产物**：`AE.xpt` / `DM.xpt` / `VS.xpt`
 
 **练习**：用同样方式生成 DM 域和 VS 域。
 
-# 课时 2：用 skill 生成 ADaM + TFL {.center}
+# 课时 2：用 Claude Code 生成 ADaM + TFL {.center}
 
 *分析数据集 + 表格图形 · 60 分钟*
 
