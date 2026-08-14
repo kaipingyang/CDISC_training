@@ -37,7 +37,30 @@ By the end of the course, participants will be able to use Claude Code and Agent
 ## 环境要求
 
 - R >= 4.2.0
-- Claude Code（用于触发 `sdtm-domain` 和 `adam-domain` skill）
+- Claude Code（用于触发 `sdtm`、`adam`、`tfl` 等 skill）
+
+---
+
+## 参考答案 vs 学员练习区
+
+本项目分两层，别混用：
+
+| 目录 | 角色 | 怎么用 |
+|------|------|--------|
+| `sdtm/` `adam/` `tfl/` | **参考答案**（完整可运行） | 对照用，**别改** |
+| `users/<你的名字>/` | **练习区**（挖空 starter） | 填 `# TODO` 练习 |
+
+**开始练习**（两种方式）：
+
+```r
+# 方式一：跑初始化脚本，把挖空 starter 复制到你的练习目录
+Rscript users/setup.R zhangsan     # 换成你的拼音名
+```
+
+或在 Claude Code 里说 **"帮我创建练习区"**（触发 `new-user` skill，它会问你名字并初始化）。
+
+初始化后：打开 `users/<你的名字>/sdtm/ae.R` 按 `# TODO` 填空 → 填不出问 Claude Code
+"帮我补全这个 TODO" → 跑通后对照 `sdtm/ae.R` 答案。学员目录不入库，是你的私有副本。
 
 ---
 

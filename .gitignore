@@ -28,3 +28,7 @@ data/raw/*.xpt
 docs/*.html
 docs/*_files/
 .quarto/
+
+# Student practice copies (keep _template and setup.R, ignore per-student dirs)
+users/*/
+!users/_template/
