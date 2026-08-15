@@ -4,15 +4,17 @@
 Shiny 标准惯例），把 SDTM → ADaM → TFL 的产出变成可交互探索平台。
 数据与 `sdtm/`、`adam/`、`tfl/` 脚本同源（pharmaverseraw / pharmaverseadam）。
 
-## 功能（10 个模块）
+## 功能（模块结构）
 
-| 模块 | 内容 |
-|---|---|
-| SDTM 数据浏览 | DM / AE / VS（对应 `sdtm/` 脚本产物，3 个 tab） |
-| ADaM 数据浏览 | ADSL / ADAE / ADTTE（对应 `adam/` 脚本产物，3 个 tab） |
-| 人口学特征表 | `tm_t_summary`（对应 `tfl/t_demographic.R`） |
-| 不良事件汇总表 | `tm_t_events`（对应 `tfl/t_adverse_events.R`） |
-| KM 生存曲线 | `tm_g_km`（对应 `tfl/g_km.R`） |
+```
+Front page
+├── SDTM 数据          （一个模块内展示 DM / AE / VS 三张表）
+├── ADaM 数据          （一个模块内展示 ADSL / ADAE / ADTTE 三张表）
+└── TFL                （上级目录）
+    ├── 人口学特征表     （tm_t_summary，对应 tfl/t_demographic.R）
+    ├── 不良事件汇总表   （tm_t_events，对应 tfl/t_adverse_events.R）
+    └── KM 生存曲线     （tm_g_km，对应 tfl/g_km.R）
+```
 
 ## 运行
 

@@ -103,44 +103,44 @@ modules <- modules(
       "SDTM → ADaM → TFL 全流程产出交互浏览"
     )
   ),
-  # SDTM 数据浏览（对应 sdtm/ 脚本产物）
-  tm_data_table(label = "SDTM DM 数据", datanames = "DM"),
-  tm_data_table(label = "SDTM AE 数据", datanames = "AE"),
-  tm_data_table(label = "SDTM VS 数据", datanames = "VS"),
-  # ADaM 数据浏览（对应 adam/ 脚本产物）
-  tm_data_table(label = "ADSL 数据", datanames = "ADSL"),
-  tm_data_table(label = "ADAE 数据", datanames = "ADAE"),
-  tm_data_table(label = "ADTTE 数据", datanames = "ADTTE"),
-  tm_t_summary(
-    label = "人口学特征表",
-    dataname = "ADSL",
-    parentname = "ADSL",
-    arm_var = choices_selected(variable_choices(ADSL, "ACTARM"), "ACTARM"),
-    summarize_vars = choices_selected(
-      variable_choices(ADSL, c("AGE", "SEX", "RACE", "AGEGR1")),
-      c("AGE", "SEX", "RACE", "AGEGR1")
+  # SDTM：一个模块看三个域（对应 sdtm/ 脚本产物）
+  tm_data_table(label = "SDTM 数据", datanames = c("DM", "AE", "VS")),
+  # ADaM：一个模块看三个数据集（对应 adam/ 脚本产物）
+  tm_data_table(label = "ADaM 数据", datanames = c("ADSL", "ADAE", "ADTTE")),
+  # TFL：上级目录 + 三个子模块
+  modules(
+    label = "TFL",
+    tm_t_summary(
+      label = "人口学特征表",
+      dataname = "ADSL",
+      parentname = "ADSL",
+      arm_var = choices_selected(variable_choices(ADSL, "ACTARM"), "ACTARM"),
+      summarize_vars = choices_selected(
+        variable_choices(ADSL, c("AGE", "SEX", "RACE", "AGEGR1")),
+        c("AGE", "SEX", "RACE", "AGEGR1")
+      )
+    ),
+    tm_t_events(
+      label = "不良事件汇总表",
+      dataname = "ADAE",
+      parentname = "ADSL",
+      arm_var = choices_selected(variable_choices(ADAE, "ACTARM"), "ACTARM"),
+      hlt = choices_selected(variable_choices(ADAE, "AEBODSYS"), "AEBODSYS"),
+      llt = choices_selected(variable_choices(ADAE, "AEDECOD"), "AEDECOD"),
+      add_total = TRUE
+    ),
+    tm_g_km(
+      label = "KM 生存曲线",
+      dataname = "ADTTE",
+      parentname = "ADSL",
+      arm_var = choices_selected(variable_choices(ADSL, "ACTARM"), "ACTARM"),
+      paramcd = choices_selected(value_choices(ADTTE, "PARAMCD", "PARAM"), "OS"),
+      strata_var = choices_selected(variable_choices(ADSL, "SEX"), "SEX"),
+      facet_var = choices_selected(variable_choices(ADSL, c("SEX", "RACE")), NULL),
+      # aval/cnsr 显式指定（gotchas #6：延迟解析取不到；cnsr 用的是派生的 is_event）
+      aval_var = choices_selected(variable_choices(ADTTE, "AVAL"), "AVAL"),
+      cnsr_var = choices_selected(variable_choices(ADTTE, "is_event"), "is_event")
     )
-  ),
-  tm_t_events(
-    label = "不良事件汇总表",
-    dataname = "ADAE",
-    parentname = "ADSL",
-    arm_var = choices_selected(variable_choices(ADAE, "ACTARM"), "ACTARM"),
-    hlt = choices_selected(variable_choices(ADAE, "AEBODSYS"), "AEBODSYS"),
-    llt = choices_selected(variable_choices(ADAE, "AEDECOD"), "AEDECOD"),
-    add_total = TRUE
-  ),
-  tm_g_km(
-    label = "KM 生存曲线",
-    dataname = "ADTTE",
-    parentname = "ADSL",
-    arm_var = choices_selected(variable_choices(ADSL, "ACTARM"), "ACTARM"),
-    paramcd = choices_selected(value_choices(ADTTE, "PARAMCD", "PARAM"), "OS"),
-    strata_var = choices_selected(variable_choices(ADSL, "SEX"), "SEX"),
-    facet_var = choices_selected(variable_choices(ADSL, c("SEX", "RACE")), NULL),
-    # aval/cnsr 显式指定（gotchas #6：延迟解析取不到；cnsr 用的是派生的 is_event）
-    aval_var = choices_selected(variable_choices(ADTTE, "AVAL"), "AVAL"),
-    cnsr_var = choices_selected(variable_choices(ADTTE, "is_event"), "is_event")
   )
 )
 
