@@ -108,4 +108,6 @@ app <- init(
   modules = modules
 )
 
+# 标准 Shiny app.R 约定（Posit Connect 部署直接识别本对象）
+# 本地运行：R 会话里 runApp("app")（或 shiny::runApp(app)）
 shiny::shinyApp(ui = app$ui, server = app$server)
