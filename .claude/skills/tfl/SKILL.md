@@ -212,3 +212,8 @@ A：表格用 `export_as_txt()`（文本）、`as_html()`（网页）、`export_
 ## 下一步引导
 
 TFL 生成后，若需要**交互式探索**分析数据集（动态筛选、切换参数），可以了解 pharmaverse 的 `teal` 框架——它把 tern/rtables 的输出包装成 Shiny 交互应用。这部分属于 Shiny/teal 的进阶主题，本 skill 不展开。
+
+## 延伸学习
+
+官方 pharma-skills 仓库（生产级规范与更多 TFL 相关约定）：
+<https://github.com/RConsortium/pharma-skills>

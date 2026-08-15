@@ -486,3 +486,9 @@ install.packages(c("sdtm.oak", "xportr", "pharmaversesdtm", "haven", "dplyr", "t
 library(sdtm.oak)
 packageVersion("sdtm.oak")
 ```
+
+## 延伸学习
+
+官方生产级 sdtm.oak skill（英文、含函数参考与常见错误清单，权威依据）：
+<https://github.com/RConsortium/pharma-skills> 的 `sdtm-oak/` 目录；
+本仓库 `.claude/skills/sdtm-oak/` 已有完整副本。

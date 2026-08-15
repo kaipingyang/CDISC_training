@@ -407,6 +407,19 @@ teal 交互展示属于 **Shiny 进阶主题**，是另一场培训（shiny_trai
 本次培训到"生成分析就绪的数据 + 静态 TFL"为止 —— 这已是电子提交的核心产出。
 :::
 
+## 扩展：官方 pharma-skills 生态 {.smaller}
+
+本项目的 skill 之外，R Consortium 维护官方 **pharma-skills** 仓库：
+<https://github.com/RConsortium/pharma-skills>
+
+- 生产级 skill 家族：`admiral`（ADaM）、`sdtm-oak`（SDTM）等
+- 本仓库已内置完整副本（`.claude/skills/admiral/`、`.claude/skills/sdtm-oak/`）
+- 想深究规范细节（日期规则、flag 约定、函数选择）时，直接问 Claude，它会引用官方依据
+
+::: {.callout-note}
+扩展内容，本次不展开 —— 供想了解生产级规范的同学课后探索。
+:::
+
 ## 谢谢 {.center}
 
 **项目仓库**：<https://github.com/kaipingyang/CDISC_training>

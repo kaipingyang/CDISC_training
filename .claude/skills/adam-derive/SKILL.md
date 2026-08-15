@@ -268,3 +268,9 @@ A：使用 `derive_vars_period()` 函数，admiral 文档中有专门的 vignett
 - `adam/adtte.R` - ADTTE 完整示例
 
 如果本地脚本与模板有差异，以本地脚本为准——它已针对项目实际 SDTM 结构做了调整。
+
+## 延伸学习
+
+官方生产级 admiral skill 家族（英文、含日期/flag 约定与 QC 模式，权威依据）：
+<https://github.com/RConsortium/pharma-skills> 的 `admiral/` 目录；
+本仓库 `.claude/skills/admiral/` 已有完整副本（父级 + admiral-adsl/admiral-bds）。

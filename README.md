@@ -34,6 +34,25 @@ By the end of the course, participants will be able to use Claude Code and Agent
 
 ---
 
+## 延伸学习资源（官方 pharma-skills）
+
+本仓库 `.claude/skills/` 中的 **`admiral/`**（admiral 家族：父级 + ADSL/BDS）与
+**`sdtm-oak/`** 来自 **R Consortium 官方 pharma-skills 仓库**（MIT 许可，含完整
+references/ 参考文档与 LICENSE 副本）：
+
+- 官方仓库：<https://github.com/RConsortium/pharma-skills>
+- admiral 家族（ADaM 派生，生产级）：`admiral/admiral-adsl`、`admiral/admiral-bds`
+- sdtm-oak（SDTM 映射，生产级）：`sdtm-oak`
+- 官方另有其他 skill 家族（临床试验模拟、统计审阅、成组序贯设计等），按需拉取：
+  `git clone https://github.com/RConsortium/pharma-skills` 后复制需要的目录到
+  `.claude/skills/`（注意同时复制其 references/ 与 LICENSE）
+
+> 本地中文教学 skill（`sdtm-map` / `adam-derive` / `tfl`）与官方 skill 是互补关系：
+> 教学 skill 面向学员练习（中文、自包含），官方 skill 提供生产级规范与权威函数
+> 参考，可作教学校验与深入探索的入口。
+
+---
+
 ## 环境要求
 
 - R >= 4.2.0
