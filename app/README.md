@@ -1,14 +1,15 @@
-# app/ — 交互展示 App（teal）
+# app.R — 交互展示 App（teal）
 
-基于 **teal + teal.modules.clinical** 的单一 Shiny app，把 SDTM → ADaM → TFL
-的产出变成可交互探索平台。与 `tfl/` 脚本同源（`pharmaverseadam` 数据），
-三张标准 TFL 均可动态切换参数。
+基于 **teal + teal.modules.clinical** 的单一 Shiny app（`app.R` 在项目根目录，
+Shiny 标准惯例），把 SDTM → ADaM → TFL 的产出变成可交互探索平台。
+数据与 `sdtm/`、`adam/`、`tfl/` 脚本同源（pharmaverseraw / pharmaverseadam）。
 
-## 功能
+## 功能（10 个模块）
 
 | 模块 | 内容 |
 |---|---|
-| 数据浏览 | ADSL / ADAE / ADTTE 原始数据查看（3 个 tab） |
+| SDTM 数据浏览 | DM / AE / VS（对应 `sdtm/` 脚本产物，3 个 tab） |
+| ADaM 数据浏览 | ADSL / ADAE / ADTTE（对应 `adam/` 脚本产物，3 个 tab） |
 | 人口学特征表 | `tm_t_summary`（对应 `tfl/t_demographic.R`） |
 | 不良事件汇总表 | `tm_t_events`（对应 `tfl/t_adverse_events.R`） |
 | KM 生存曲线 | `tm_g_km`（对应 `tfl/g_km.R`） |
@@ -17,15 +18,15 @@
 
 ```r
 renv::restore()            # 首次：恢复环境（含 teal 系列）
-shiny::runApp("app")       # 启动（从项目根目录）
+shiny::runApp()            # 启动（项目根目录，自动识别 app.R）
 ```
 
 启动后浏览器打开 Shiny 提示的地址（本环境为 code-server，需要按
 `run-shiny` 技能的方式做端口转发）。
 
-> ⚠️ 注意：**不要**把 `app/app.R` 的内容逐行粘贴到 R 控制台执行 ——
+> ⚠️ 注意：**不要**把 `app.R` 的内容逐行粘贴到 R 控制台执行 ——
 > 脚本大量使用多行管道（`|>`）和跨行调用，逐行执行会全部报语法错误。
-> 用 `runApp("app")` 或 `source("app/app.R")` 整体加载。
+> 用 `runApp()` 或 `source("app.R")` 整体加载。
 
 ## 数据源说明
 

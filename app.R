@@ -29,8 +29,23 @@ library(teal.modules.general)   # tm_front_page / tm_data_table
 library(teal.modules.clinical)  # tm_t_summary / tm_t_events / tm_g_km
 
 # ── 数据准备 ─────────────────────────────────────────────────────────────
+# SDTM 域（与 sdtm/ 脚本输出对应，展示用）+ ADaM 域（与 adam/ 脚本输出对应）
 data <- teal_data()
 data <- within(data, {
+  # ── SDTM ──
+  DM <- pharmaversesdtm::dm |>
+    dplyr::mutate(
+      dplyr::across(dplyr::any_of(c("SEX", "RACE", "ARM", "ACTARM")), as.factor)
+    )
+  AE <- pharmaversesdtm::ae |>
+    dplyr::mutate(
+      dplyr::across(dplyr::any_of(c("AEBODSYS", "AEDECOD", "AESEV", "AEOUT", "AEREL")), as.factor)
+    )
+  VS <- pharmaversesdtm::vs |>
+    dplyr::mutate(
+      dplyr::across(dplyr::any_of(c("VSTESTCD", "VSTEST", "VSPOS", "VSLOC")), as.factor)
+    )
+  # ── ADaM ──
   ADSL <- pharmaverseadam::adsl |>
     dplyr::mutate(
       # 显式 levels 控制治疗组列顺序（默认字母序 High 在前，与 tfl/ 脚本不一致）
@@ -52,9 +67,20 @@ data <- within(data, {
       is_event = as.integer(CNSR == 0)      # tm_g_km 需要事件标志（CNSR 是 integer）
     )
 })
-join_keys(data) <- default_cdisc_join_keys[names(data)]
+# join keys：ADSL 是 ADaM 主表；SDTM 域（DM/AE/VS）同样按 USUBJID 关联（default 不含 SDTM 域，需显式加）
+join_keys(data) <- c(
+  default_cdisc_join_keys[names(data)],
+  join_keys(
+    join_key("ADSL", "DM", keys = c("STUDYID", "USUBJID")),
+    join_key("ADSL", "AE", keys = c("STUDYID", "USUBJID")),
+    join_key("ADSL", "VS", keys = c("STUDYID", "USUBJID"))
+  )
+)
 
 # 数据框引用（构造 choices 用，立即解析比字符串延迟解析稳）
+DM    <- data[["DM"]]
+AE    <- data[["AE"]]
+VS    <- data[["VS"]]
 ADSL  <- data[["ADSL"]]
 ADAE  <- data[["ADAE"]]
 ADTTE <- data[["ADTTE"]]
@@ -67,6 +93,11 @@ modules <- modules(
       "SDTM → ADaM → TFL 全流程产出交互浏览"
     )
   ),
+  # SDTM 数据浏览（对应 sdtm/ 脚本产物）
+  tm_data_table(label = "SDTM DM 数据", datanames = "DM"),
+  tm_data_table(label = "SDTM AE 数据", datanames = "AE"),
+  tm_data_table(label = "SDTM VS 数据", datanames = "VS"),
+  # ADaM 数据浏览（对应 adam/ 脚本产物）
   tm_data_table(label = "ADSL 数据", datanames = "ADSL"),
   tm_data_table(label = "ADAE 数据", datanames = "ADAE"),
   tm_data_table(label = "ADTTE 数据", datanames = "ADTTE"),
