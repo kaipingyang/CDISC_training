@@ -108,4 +108,7 @@ PORTS 面板生成的代理 URL 通常包含 `%5C`（反斜杠被错误编码）
   - 证书仅 `*.mediwei.com`，不覆盖 c3c-training 二级域（ERR_CERT_COMMON_NAME_INVALID）
   - 路径式 `/proxy/<port>/` 被平台 SPA 壳 404
 - 启动要求：`runApp(host = "0.0.0.0", port = <port>)`（127.0.0.1 外面访问不到）
+- **正确的外部访问路径**：`https://c3c-training.mediwei.com/u/<BASE_URL空间>/proxy/<port>/`
+  （BASE_URL 环境变量形如 `/u/c3c-training-kaiping-cdisc-training`；未登录时 302 到 /login，
+  浏览器已登录则直达；curl 无 cookie 只能看到 302/壳页，用 Playwright 无认证同样不行）
 - UI 验证替代：Playwright 无头浏览器（Chromium 已装 ~/.cache/ms-playwright）+ 截图
