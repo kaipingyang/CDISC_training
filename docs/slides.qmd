@@ -120,32 +120,48 @@ lang: zh
 **SDTM**（Study Data Tabulation Model）：把 EDC 采集的**原始数据**，按 CDISC 规定
 **重命名、标准化**成监管提交用的规范格式。数据按**域（Domain）**组织：DM / VS / AE……
 
-**先看真实数据长什么样** —— 左侧是原始采集，右侧是映射后的 SDTM：
+**三种映射动作**（sdtm.oak）：
 
-:::: {.columns}
+| 动作 | 作用 | 例子 |
+|------|------|------|
+| `assign_no_ct` | 原样复制 | 年龄 "64" → AGE="64" |
+| `assign_ct` | 按受控术语表转换 | "Mild Adverse Event" → AESEV="MILD" |
+| `hardcode_ct` | 写固定常量 | 每行 DOMAIN="AE" |
 
-::: {.column width="50%"}
-**原始采集数据（`pharmaverseraw::ae_raw`）**
+接下来两页看**真实数据**：原始采集 vs 映射后的 SDTM。
+
+## 原始采集数据长什么样
+
+`pharmaverseraw::ae_raw` —— 字段名和取值都是"人话"（EDC 直接导出的样子）：
 
 ```{r}
 #| eval: TRUE
 #| echo: FALSE
 #| message: FALSE
-library(reactable)
+cat("DEBUG_LIBS:", paste(.libPaths(), collapse = " || "), "\n")
+cat("DEBUG_R_LIBS:", Sys.getenv("R_LIBS"), "\n")
+library(reactable); library(dplyr)
 ae_raw <- pharmaverseraw::ae_raw
 reactable::reactable(
-  head(ae_raw, 5),
+  head(ae_raw, 5) |> dplyr::select("STUDY", "PATNUM", "IT.AETERM", "IT.AESEV", "AEOUTCOME"),
   columns = list(
-    AEOUTCOME = reactable::colDef(header = "结局（人话）"),
-    IT.AESEV  = reactable::colDef(header = "严重程度（人话）")
+    STUDY      = reactable::colDef(header = "研究"),
+    PATNUM     = reactable::colDef(header = "受试者"),
+    IT.AETERM  = reactable::colDef(header = "不良事件（人话）"),
+    IT.AESEV   = reactable::colDef(header = "严重程度（人话）"),
+    AEOUTCOME  = reactable::colDef(header = "结局（人话）")
   ),
-  height = 320, highlight = TRUE
+  height = 340, highlight = TRUE
 )
 ```
+
+::: {.callout-note}
+注意取值："Mild Adverse Event"、"Recovered/Resolved" —— **半自然语言**，不是标准码。
 :::
 
-::: {.column width="50%"}
-**SDTM 标准数据（`pharmaversesdtm::ae`）**
+## SDTM 标准数据长什么样
+
+同一批数据，映射成 `pharmaversesdtm::ae` 之后 —— **统一大写 + 受控术语**：
 
 ```{r}
 #| eval: TRUE
@@ -153,20 +169,22 @@ reactable::reactable(
 #| message: FALSE
 ae <- pharmaversesdtm::ae
 reactable::reactable(
-  head(ae, 5),
+  head(ae, 5) |> dplyr::select("STUDYID", "USUBJID", "AESEQ", "AEDECOD", "AESEV", "AEOUT"),
   columns = list(
-    AETERM = reactable::colDef(header = "不良事件术语"),
-    AESEV  = reactable::colDef(header = "严重程度（标准值）"),
-    AEOUT  = reactable::colDef(header = "结局（标准值）")
+    STUDYID = reactable::colDef(header = "研究"),
+    USUBJID = reactable::colDef(header = "受试者编号"),
+    AESEQ   = reactable::colDef(header = "序号"),
+    AEDECOD = reactable::colDef(header = "不良事件（标准术语）"),
+    AESEV   = reactable::colDef(header = "严重程度（标准值）"),
+    AEOUT   = reactable::colDef(header = "结局（标准值）")
   ),
-  height = 320, highlight = TRUE
+  height = 340, highlight = TRUE
 )
 ```
+
+::: {.callout-tip}
+对比上一页：同一件事，"Mild Adverse Event" → `AESEV = "MILD"` —— 这就是 `assign_ct` 干的事。
 :::
-
-::::
-
-**三种映射动作**（sdtm.oak）：`assign_no_ct`（原样复制）· `assign_ct`（按 CT 表转换）· `hardcode_ct`（写固定常量）
 
 ## 课堂演示：生成 DM 域（最基础的域）
 
@@ -273,10 +291,12 @@ ae <- ae_raw %>%
 #| message: FALSE
 adsl <- pharmaverseadam::adsl
 reactable::reactable(
-  head(adsl, 5),
+  head(adsl, 5) |> dplyr::select("USUBJID", "AGE", "SEX", "RACE", "ACTARM", "SAFFL"),
   columns = list(
     USUBJID = reactable::colDef(header = "受试者编号"),
     AGE     = reactable::colDef(header = "年龄"),
+    SEX     = reactable::colDef(header = "性别"),
+    RACE    = reactable::colDef(header = "种族"),
     ACTARM  = reactable::colDef(header = "实际治疗组"),
     SAFFL   = reactable::colDef(header = "安全性人群")
   ),
