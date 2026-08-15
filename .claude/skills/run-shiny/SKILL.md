@@ -99,3 +99,13 @@ PORTS 面板生成的代理 URL 通常包含 `%5C`（反斜杠被错误编码）
 - **"The requested page was not found"**: 检查是否用了 `host = "0.0.0.0"` 而非默认的 `127.0.0.1`
 - **URL 中有 `%5C`**: 推荐用 Simple Browser 打开；或手动把 `%5C` 替换为 `/`
 - **端口被占用**: 换一个端口号，如 `port = 7777`
+
+## 本环境（PharmaROSE code-server）实测适配
+
+- 平台：code-server + `--proxy-domain c3c-training.mediwei.com`（VSCODE_PROXY_URI 指向它）
+- **端口转发当前不可用**（2026-08-15 实测）：
+  - 子域 `https://<port>.c3c-training.mediwei.com/` → 网关 404（无转发规则）
+  - 证书仅 `*.mediwei.com`，不覆盖 c3c-training 二级域（ERR_CERT_COMMON_NAME_INVALID）
+  - 路径式 `/proxy/<port>/` 被平台 SPA 壳 404
+- 启动要求：`runApp(host = "0.0.0.0", port = <port>)`（127.0.0.1 外面访问不到）
+- UI 验证替代：Playwright 无头浏览器（Chromium 已装 ~/.cache/ms-playwright）+ 截图
