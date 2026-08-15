@@ -18,11 +18,11 @@ Shiny 标准惯例），把 SDTM → ADaM → TFL 的产出变成可交互探索
 
 ```r
 renv::restore()            # 首次：恢复环境（含 teal 系列）
-shiny::runApp()            # 启动（项目根目录，自动识别 app.R）
+Rscript run_app.R          # 一键启动（自动监听 0.0.0.0 + 打印访问 URL）
 ```
 
-启动后浏览器打开 Shiny 提示的地址（本环境为 code-server，需要按
-`run-shiny` 技能的方式做端口转发）。
+启动后按终端打印的地址访问：本地 `http://127.0.0.1:<port>`，
+外部（PharmaROSE 平台）`https://c3c-training.mediwei.com<BASE_URL>/proxy/<port>/`。
 
 > ⚠️ 注意：**不要**把 `app.R` 的内容逐行粘贴到 R 控制台执行 ——
 > 脚本大量使用多行管道（`|>`）和跨行调用，逐行执行会全部报语法错误。
