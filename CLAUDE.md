@@ -34,3 +34,5 @@ Agent Skills，用中文自然语言驱动生成 SDTM / ADaM / TFL 数据集与�
 
 - R 包环境由 renv 管理；机器级配置（如 RENV_PATHS_ROOT）在 `~/.Renviron`，不入库
 - `.Rprofile` 与 `.git-config.json` 为本地文件，均不提交
+- quarto 持久化在 `/config/quarto/bin/quarto`（渲染 `docs/*.qmd` 用：
+  `quarto render docs/slides.qmd --self-contained`，产物 html 不入库）
