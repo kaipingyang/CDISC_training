@@ -41,9 +41,26 @@ lang: zh
 | **CDISCPILOT01** | pharmaverse 内置的公开示例研究数据 |
 
 ::: {.callout-note}
-本项目内置 **7 个 skill**：`sdtm`、`sdtm-map`、`adam`、`adam-derive`、`admiral-adsl`、`admiral-bds`、`tfl`。
+本项目内置 **十余个 skill**：教学层（`sdtm`、`sdtm-map`、`adam`、`adam-derive`、`tfl` 等，中文）
++ 官方参考层（`admiral` 家族、`sdtm-oak`，来自 R Consortium pharma-skills）。
 用自然语言描述需求，对应 skill 自动加载，按 CDISC 标准生成可运行代码。
 :::
+
+## 什么是 CDISC
+
+**CDISC**：临床数据交换标准协会制定的**数据标准体系**。监管机构（FDA/EMA）要求
+提交的临床试验数据遵循统一格式 —— 不标准的数据无法评审。
+
+**数据流水线的四个层次**：
+
+| 层次 | 是什么 | 例子 |
+|------|--------|------|
+| **原始数据（EDC）** | 医院/研究中心采集的病例数据 | "Recovered/Resolved"、"Mild" |
+| **SDTM** | 整理成规范表格式的原始数据 | 大写 + 受控术语（AESEV="MILD"） |
+| **ADaM** | 可直接统计分析的分析数据集 | 生存时间、治疗期标志 |
+| **TFL** | 报告交付物：表格/图/清单 | 人口学表、KM 曲线 |
+
+**CDISCPILOT01**：CDISC 官方发布的示例研究数据（pharmaverse 内置），本课全程使用。
 
 # 课时 1：用 Claude Code 生成 SDTM {.center}
 
@@ -56,7 +73,7 @@ lang: zh
 **不懂 R 也能上手，三件事**：
 
 1. **对话驱动** —— 直接用中文说要干什么，AI 生成/修改 `.R` 脚本，你审阅后运行
-2. **skill 触发** —— 说到领域关键词（如"生成 AE 域"），对应 skill 自动加载，按 CDISC 规范写代码
+2. **skill 触发** —— 说到领域关键词（如"生成 DM 域"），对应 skill 自动加载，按 CDISC 规范写代码
 3. **看懂 + 迭代** —— AI 生成的代码有中文注释；不满意就继续说"把 X 改成 Y"
 
 ::: {.callout-tip}
@@ -72,7 +89,7 @@ lang: zh
 |------|--------|
 | **启动** | 终端输 `claude` 回车 |
 | **对话** | 直接打字 + 回车 |
-| **引用文件** | `@sdtm/ae.R`（让 AI 读某个文件再干活） |
+| **引用文件** | `@sdtm/dm.R`（让 AI 读某个文件再干活） |
 | **中断生成** | `ESC`（AI 跑偏了打断，**不退出**） |
 | **退出 CLI** | `ctrl + C` 按两次 |
 | **接受 / 拒绝改动** | AI 改文件会问，`y` 确认、`n` 拒绝 |
@@ -88,10 +105,10 @@ lang: zh
 
 | 动作 | 你怎么说 | 场景 |
 |------|---------|------|
-| **① 对话生成** | "帮我生成 AE 域的 SDTM 映射代码" | 从零起一个脚本 |
+| **① 对话生成** | "帮我生成 DM 域的 SDTM 映射代码" | 从零起一个脚本 |
 | **② 显式喊 skill** | "用 sdtm-map skill 做 VS 域" | 关键词没自动触发时 |
-| **③ 文件引用** | "参考 `sdtm/ae.R` 帮我写 `vs.R`" | 让 AI 照已有脚本仿写 |
-| **④ 迭代修改** | "把导出路径改成 tempdir()" | 生成后继续调 |
+| **③ 文件引用** | "参考 `sdtm/dm.R` 帮我写 `vs.R`" | 让 AI 照已有脚本仿写 |
+| **④ 迭代修改** | "把导出路径改成 output 目录" | 生成后继续调 |
 | **⑤ 解释 + 排错** | "解释这段 `assign_ct`" / "跑报错了，帮我修" | 看懂代码、AI 读报错自动 debug |
 
 ::: {.callout-note}
@@ -101,29 +118,49 @@ lang: zh
 ## 什么是 SDTM
 
 **SDTM**（Study Data Tabulation Model）：把 EDC 采集的**原始数据**，按 CDISC 规定
-**重命名、标准化**成监管提交用的规范格式。数据按**域（Domain）**组织：DM / AE / VS……
+**重命名、标准化**成监管提交用的规范格式。数据按**域（Domain）**组织：DM / VS / AE……
+
+**先看真实数据长什么样** —— 左侧是原始采集，右侧是映射后的 SDTM：
 
 :::: {.columns}
 
 ::: {.column width="50%"}
-**原始采集数据（EDC）**
+**原始采集数据（`pharmaverseraw::ae_raw`）**
 
-```r
-# ae_raw：字段名和取值都是"人话"
-AEOUTCOME = "Recovered/Resolved"
-IT.AESEV  = "Mild Adverse Event"
-IT.AEREL  = "Probably Related"
+```{r}
+#| eval: TRUE
+#| echo: FALSE
+#| message: FALSE
+library(reactable)
+ae_raw <- pharmaverseraw::ae_raw
+reactable::reactable(
+  head(ae_raw, 5),
+  columns = list(
+    AEOUTCOME = reactable::colDef(header = "结局（人话）"),
+    IT.AESEV  = reactable::colDef(header = "严重程度（人话）")
+  ),
+  height = 320, highlight = TRUE
+)
 ```
 :::
 
 ::: {.column width="50%"}
-**SDTM 标准数据**
+**SDTM 标准数据（`pharmaversesdtm::ae`）**
 
-```r
-# 重命名 + 受控术语(CT)标准化
-AEOUT = "RECOVERED/RESOLVED"
-AESEV = "MILD"
-AEREL = "PROBABLY RELATED"
+```{r}
+#| eval: TRUE
+#| echo: FALSE
+#| message: FALSE
+ae <- pharmaversesdtm::ae
+reactable::reactable(
+  head(ae, 5),
+  columns = list(
+    AETERM = reactable::colDef(header = "不良事件术语"),
+    AESEV  = reactable::colDef(header = "严重程度（标准值）"),
+    AEOUT  = reactable::colDef(header = "结局（标准值）")
+  ),
+  height = 320, highlight = TRUE
+)
 ```
 :::
 
@@ -131,64 +168,84 @@ AEREL = "PROBABLY RELATED"
 
 **三种映射动作**（sdtm.oak）：`assign_no_ct`（原样复制）· `assign_ct`（按 CT 表转换）· `hardcode_ct`（写固定常量）
 
-## 主线演示：生成 AE 域
+## 课堂演示：生成 DM 域（最基础的域）
 
-**在 Claude Code 里，你只需要说**：
+**DM（人口学）**：每个受试者一行，含年龄/性别/种族等基本信息 —— 最简单的域，适合第一个上手。
 
-> "帮我用 sdtm.oak 生成 AE 域的映射代码，原始数据是 pharmaverseraw 的 ae_raw"
+在 Claude Code 中输入需求：
 
-`sdtm-map` skill 自动加载（触发词：`AE域`、`生成SDTM`、`sdtm.oak`），生成映射脚本：
+> "帮我用 sdtm.oak 生成 DM 域的映射代码，原始数据是 pharmaverseraw 的 dm_raw"
+
+`sdtm-map` skill 自动加载（触发词：`DM域`、`生成SDTM`、`sdtm.oak`），生成映射脚本：
 
 ```r
-ae <- ae %>%
-  # 映射不良事件结局 AEOUT（按 CT 表转换）
-  assign_ct(
-    raw_dat = ae_raw, raw_var = "AEOUTCOME", tgt_var = "AEOUT",
-    ct_spec = study_ct, ct_clst = "C66768", id_vars = oak_id_vars()
-  ) %>%
-  # 映射严重程度 AESEV
-  assign_ct(
-    raw_dat = ae_raw, raw_var = "IT.AESEV", tgt_var = "AESEV",
-    ct_spec = study_ct, ct_clst = "C66769", id_vars = oak_id_vars()
-  )
+dm <- dm_raw %>%
+  generate_oak_id_vars(pat_var = "PATNUM", raw_src = "dm_raw") %>%
+  assign_no_ct(raw_dat = dm_raw, raw_var = "IT.AGE", tgt_var = "AGE",
+               id_vars = oak_id_vars()) %>%          # 年龄：原样复制
+  assign_ct(raw_dat = dm_raw, raw_var = "IT.SEX", tgt_var = "SEX",
+            ct_spec = study_ct, ct_clst = "C66731",
+            id_vars = oak_id_vars()) %>%              # 性别：按 CT 表转换
+  hardcode_ct(tgt_var = "DOMAIN", value = "DM",
+              id_vars = oak_id_vars())                # 域代码：固定值
 ```
 
 ## 运行与产物
 
 ```r
-source("sdtm/ae.R")   # 生成 AE 域，导出 ae.xpt
+source("sdtm/dm.R")   # 生成 DM 域，导出 dm.xpt
 ```
 
-**产物**：符合 SDTM 规范的 AE 数据集（STUDYID / USUBJID / AESEQ / AETERM / AESEV / AEOUT…），
-导出为 `ae.xpt`（SAS 传输文件，供电子提交）。
+**产物**：符合 SDTM 规范的 DM 数据集（STUDYID / USUBJID / AGE / SEX / RACE…），
+导出为 `dm.xpt`（SAS 传输文件，写入 `sdtm/output/`）。
 
 ::: {.callout-important}
-**踩坑：受控术语表要齐**。`assign_ct` 用的 codelist（如 `C66769` 严重程度）必须在
+**踩坑：受控术语表要齐**。`assign_ct` 用的 codelist（如 `C66731` 性别）必须在
 `metadata/sdtm_ct.csv` 里有对应条目，否则报 `ct_clst must be equal to one of…`。
-本项目的 CT 表已按 NCI-EVS 官方值补全 AE/VS 所需 codelist。
+本项目的 CT 表已按 NCI-EVS 官方值补全。
 :::
 
-## 动手练习：生成 DM 域 {background-opacity="0.04"}
+## 动手练习：生成 VS 域 {background-opacity="0.04"}
 
-**目标**：仿照 AE，用 skill 生成 DM（人口学）域。
+**目标**：仿照 DM，生成 VS（生命体征）域 —— 难度中等：多个指标 + 单位换算。
 
 ```r
 library(sdtm.oak); library(pharmaverseraw); library(dplyr)
 
-dm_raw <- pharmaverseraw::dm_raw
+vs_raw <- pharmaverseraw::vs_raw
 study_ct <- read.csv("metadata/sdtm_ct.csv")
 
-dm <- dm_raw %>%
-  generate_oak_id_vars(pat_var = "PATNUM", raw_src = "dm_raw") %>%
-  # TODO 1: 映射 SEX（原始 IT.SEX → 目标 SEX，用 assign_ct，codelist "C66731"）
-  # 👉 在这里补一段 assign_ct(...)
-  # TODO 2: 映射 AGE（原始 IT.AGE → 目标 AGE，无需 CT，用 assign_no_ct）
+vs <- vs_raw %>%
+  generate_oak_id_vars(pat_var = "PATNUM", raw_src = "vs_raw") %>%
+  # TODO 1: 映射 VSTESTCD（原始 IT.VSTESTCD → 目标 VSTESTCD，用 assign_no_ct）
+  # 👉 在这里补一段 assign_no_ct(...)
+  # TODO 2: 映射 VSTEST（原始 IT.VSTEST → 目标 VSTEST，用 assign_no_ct）
   # 👉 在这里补一段 assign_no_ct(...)
   identity()
 ```
 
 ::: {.callout-tip}
-不会写就问 Claude Code："帮我补全这两个 TODO"。完整答案见 `sdtm/dm.R`。
+不会写就问 Claude Code："帮我补全这两个 TODO"。完整答案见 `sdtm/vs.R`。
+:::
+
+## 进阶：生成 AE 域（复杂域）
+
+**AE（不良事件）**：记录每个受试者发生的不良事件 —— 最复杂的域之一：
+多个 CT 映射（结局/严重程度/相关性）+ 关联 DM 的参照日期 + 研究日计算。
+
+```r
+ae <- ae_raw %>%
+  generate_oak_id_vars(pat_var = "PATNUM", raw_src = "ae_raw") %>%
+  assign_ct(raw_dat = ae_raw, raw_var = "AEOUTCOME", tgt_var = "AEOUT",
+            ct_spec = study_ct, ct_clst = "C66768", id_vars = oak_id_vars()) %>%
+  assign_ct(raw_dat = ae_raw, raw_var = "IT.AESEV", tgt_var = "AESEV",
+            ct_spec = study_ct, ct_clst = "C66769", id_vars = oak_id_vars()) %>%
+  derive_vars_dtm(dtc = "AEDTC")          # ISO 8601 日期解析
+```
+
+::: {.callout-note}
+完整实现见 `sdtm/ae.R`（含 SUPPAE 补充域处理）。先把 DM 和 VS 练熟，
+再挑战这个域。
 :::
 
 ## 课时 1 小结
@@ -196,9 +253,9 @@ dm <- dm_raw %>%
 - **Claude Code 五个动作**：对话生成 / 喊 skill / 文件引用 / 迭代改 / 解释排错
 - **sdtm / sdtm-map skill**：回答 SDTM 结构问题 + 生成映射代码
 - **三种映射动作**：`assign_no_ct` / `assign_ct` / `hardcode_ct`
-- **产物**：`AE.xpt` / `DM.xpt` / `VS.xpt`
+- **难度递进**：DM（基础）→ VS（单位换算）→ AE（多 CT + 日期）
 
-**练习**：用同样方式生成 DM 域和 VS 域。
+**练习**：完成 VS 域后，进阶挑战 AE 域。
 
 # 课时 2：用 Claude Code 生成 ADaM + TFL {.center}
 
@@ -208,6 +265,25 @@ dm <- dm_raw %>%
 
 **ADaM**（Analysis Data Model）：在 SDTM 基础上进一步加工成**可直接统计分析**的数据集。
 
+先看真实 ADSL 数据（每个受试者一行）：
+
+```{r}
+#| eval: TRUE
+#| echo: FALSE
+#| message: FALSE
+adsl <- pharmaverseadam::adsl
+reactable::reactable(
+  head(adsl, 5),
+  columns = list(
+    USUBJID = reactable::colDef(header = "受试者编号"),
+    AGE     = reactable::colDef(header = "年龄"),
+    ACTARM  = reactable::colDef(header = "实际治疗组"),
+    SAFFL   = reactable::colDef(header = "安全性人群")
+  ),
+  height = 300, highlight = TRUE
+)
+```
+
 - **ADSL** —— 受试者级数据集（每人一行），所有 ADaM 的基础
 - **两种结构**：
   - **BDS**（Basic Data Structure）：参数化长表，如 `ADVS` / `ADLB` / `ADTTE`
@@ -215,7 +291,7 @@ dm <- dm_raw %>%
 
 **admiral** 提供 `derive_*` 系列派生函数，一个函数做一件事，串成管道。
 
-## 主线演示：生成 ADSL → ADAE
+## 课堂演示：生成 ADSL → ADAE
 
 先建 ADSL（基础），再建其他 ADaM（都要合并 ADSL 的受试者级变量）。
 
@@ -227,12 +303,13 @@ dm <- dm_raw %>%
 ```r
 # AE 域：不良事件记录
 ae   <- pharmaversesdtm::ae
-# ADSL：受试者级(治疗日期)
-adsl <- pharmaverseadam::adsl
+# DM 域：人口学 + 治疗日期
+dm   <- pharmaversesdtm::dm
 ```
 
-> "生成 ADAE，需要标记 TRTEMFL
-> （治疗期间不良事件标志）"
+在 Claude Code 中输入：
+
+> "生成 ADAE，需要标记 TRTEMFL（治疗期间不良事件标志）"
 :::
 
 ::: {.column width="50%"}
@@ -241,7 +318,7 @@ adsl <- pharmaverseadam::adsl
 ```r
 adae <- ae %>%
   derive_vars_merged(     # 合并治疗日期
-    dataset_add = adsl,
+    dataset_add = dm,
     new_vars = exprs(TRTSDT, TRTEDT),
     by_vars = exprs(STUDYID, USUBJID)
   ) %>%
@@ -292,44 +369,50 @@ tbl <- build_table(lyt, df = adsl)
 | "AE 汇总表，按 SOC 和 PT 统计发生率" | `t_adverse_events.R` | 中级（ADAE+ADSL 分母） |
 | "画总生存期 OS 的 KM 生存曲线" | `g_km.R` | 进阶（表→图） |
 
+**下面的三张产物都是真实运行结果**（`rtables::as_html` 直接渲染，不是示意图）：
+
 ## 产物 1：人口学特征表
 
-`source("tfl/t_demographic.R")` 的**真实输出**：
-
-```{.plain code-line-numbers="false"}
-                        Placebo   Xan High   Xan Low   All Patients
-                        (N=86)     (N=72)    (N=96)      (N=254)
-———————————————————————————————————————————————————————————————————
-AGE
-  Mean (SD)            75.2 (8.6) 73.8 (7.9) 76.0 (8.1) 75.1 (8.2)
-  Median                 76.0       75.5      78.0        77.0
-SEX
-  Female               53 (61.6%) 35 (48.6%) 55 (57.3%) 143 (56.3%)
-  Male                 33 (38.4%) 37 (51.4%) 41 (42.7%) 111 (43.7%)
+```{r}
+#| eval: TRUE
+#| echo: FALSE
+#| message: FALSE
+library(rtables); library(tern); library(dplyr)
+adsl <- pharmaverseadam::adsl %>%
+  filter(SAFFL == "Y") %>%
+  mutate(SEX = factor(SEX, levels = c("F", "M"), labels = c("Female", "Male")))
+lyt <- basic_table(show_colcounts = TRUE) %>%
+  split_cols_by("ACTARM") %>%
+  add_overall_col("All Patients") %>%
+  analyze_vars(vars = c("AGE", "SEX"), .stats = c("n", "mean_sd", "count_fraction"))
+rtables::as_html(build_table(lyt, df = adsl))
 ```
 
 **一段 layout + `build_table()` 就出这张规范表** —— tern 自动算好统计量和百分比。
 
 ## 产物 2：AE 汇总表（分子分母分离）
 
-:::: {.columns}
-
-::: {.column width="46%"}
-**真实输出（节选）**
-
-```{.plain code-line-numbers="false"}
-                       Placebo  Xan High
-                       (N=86)   (N=72)
-——————————————————————————————————————————
-≥1 个 AE 的受试者      65(75.6%) 68(94.4%)
-GENERAL DISORDERS
-  ≥1 个                21(24.4%) 36(50.0%)
-    APPL SITE PRURITUS  6(7.0%) 21(29.2%)
-    APPL SITE ERYTHEMA  3(3.5%) 14(19.4%)
+```{r}
+#| eval: TRUE
+#| echo: FALSE
+#| message: FALSE
+adae <- pharmaverseadam::adae
+adsl2 <- pharmaverseadam::adsl %>% filter(SAFFL == "Y") %>%
+  mutate(ACTARM = factor(ACTARM))
+adae2 <- adae %>% filter(TRTEMFL == "Y") %>%
+  mutate(ACTARM = factor(ACTARM, levels = levels(adsl2$ACTARM)))
+lyt2 <- basic_table(show_colcounts = TRUE) %>%
+  split_cols_by("ACTARM") %>%
+  summarize_num_patients(var = "USUBJID", .stats = "unique",
+                         .labels = c(unique = "Subjects with at least one AE")) %>%
+  split_rows_by("AEBODSYS", child_labels = "visible", nested = FALSE, indent_mod = -1L) %>%
+  count_occurrences(vars = "AEDECOD")
+tbl_ae <- build_table(lyt2, df = adae2, alt_counts_df = adsl2) %>%
+  prune_table() %>%
+  sort_at_path(path = c("AEBODSYS", "*", "AEDECOD"), scorefun = score_occurrences)
+rtables::as_html(head(tbl_ae, 12))
 ```
-:::
 
-::: {.column width="54%"}
 ::: {.callout-important}
 **AE 表分母口诀：分子看 ADAE，分母看 ADSL。**
 
@@ -337,21 +420,31 @@ ADAE 里**只有发生过 AE 的人**，没发生的不在里面。
 所以百分比分母（每组总人数 N）必须单独从 ADSL 传：
 
 ```r
-build_table(lyt, df = adae,
-            alt_counts_df = adsl)  # ← 分母
+build_table(lyt, df = adae, alt_counts_df = adsl)  # ← 分母
 ```
 
 漏了它 → 分母用 ADAE 人数 → 百分比虚高。
 :::
-:::
-
-::::
 
 ## 产物 3：KM 生存曲线图
 
-`source("tfl/g_km.R")` 用 `tern::g_km()` 生成：
+```{r}
+#| eval: TRUE
+#| echo: FALSE
+#| message: FALSE
+adtte <- pharmaverseadam::adtte_onco %>%
+  filter(PARAMCD == "OS") %>%
+  mutate(ARM = factor(ARM), is_event = (CNSR == 0))
+tern::g_km(
+  df = adtte,
+  variables = list(tte = "AVAL", is_event = "is_event", arm = "ARM"),
+  annot_surv_med = TRUE,
+  title = "Kaplan-Meier Plot of Overall Survival",
+  xlab = "Time (Days)", ylab = "Survival Probability"
+)
+```
 
-![](images/g_km_os.png){height="560px" fig-alt="总生存期 Kaplan-Meier 生存曲线，按治疗组分组"}
+`tern::g_km()` 返回 **ggplot 对象**，幻灯片里直接渲染 —— 与 `tfl/g_km.R` 完全同源。
 
 ## 动手练习：改成 PFS 曲线 {background-opacity="0.04"}
 
@@ -383,7 +476,7 @@ g_km(anl,
 | **CT 表缺 codelist** | `ct_clst must be equal to one of…` | 按 NCI-EVS 官方值补 `sdtm_ct.csv` |
 | **AE 表漏分母** | 百分比虚高 | `build_table(…, alt_counts_df = adsl)` |
 | **分组变量没因子化** | 少一列/顺序乱 | `factor(ACTARM, levels = …)` 对齐分子分母 |
-| **reactive 忘加括号**（TFL 无关，通用） | 对象当函数 | admiral/tern 里注意 `exprs()` 包裹变量名 |
+| **日期没走 admiral 函数** | 部分日期静默变 NA | 用 `derive_vars_dt()`，别直接 `as.Date()` |
 
 ::: {.callout-tip}
 遇到没见过的表/图，查官方 **TLG Catalog**（数百个即用示例）：
@@ -401,9 +494,10 @@ g_km(anl,
 数据和 TFL 都有了 —— 想让它们**可交互探索**（动态筛选、切换参数）？
 
 **pharmaverse 的 `teal` 框架**：把 tern/rtables 的输出包装成 Shiny 交互应用。
+本仓库已实现一个完整示例（`app/app.R`）：数据浏览 + 三张 TFL 的交互版。
 
 ::: {.callout-note}
-teal 交互展示属于 **Shiny 进阶主题**，是另一场培训（shiny_training）的内容，本次不展开。
+teal 交互展示属于 **Shiny 进阶主题**（详见 shiny_training 培训），本次不展开。
 本次培训到"生成分析就绪的数据 + 静态 TFL"为止 —— 这已是电子提交的核心产出。
 :::
 
@@ -428,7 +522,7 @@ teal 交互展示属于 **Shiny 进阶主题**，是另一场培训（shiny_trai
 
 ```r
 renv::restore()                # 恢复环境
-source("sdtm/ae.R")            # SDTM
+source("sdtm/dm.R")            # SDTM：从最基础的 DM 域开始
 source("adam/adsl.R")          # ADaM
 source("tfl/t_demographic.R")  # TFL
 ```
