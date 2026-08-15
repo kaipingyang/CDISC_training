@@ -162,14 +162,6 @@ reactable::reactable(
 ae <- pharmaversesdtm::ae
 reactable::reactable(
   head(ae, 5) |> dplyr::select("STUDYID", "USUBJID", "AESEQ", "AEDECOD", "AESEV", "AEOUT"),
-  columns = list(
-    STUDYID = reactable::colDef(header = "研究"),
-    USUBJID = reactable::colDef(header = "受试者编号"),
-    AESEQ   = reactable::colDef(header = "序号"),
-    AEDECOD = reactable::colDef(header = "不良事件（标准术语）"),
-    AESEV   = reactable::colDef(header = "严重程度（标准值）"),
-    AEOUT   = reactable::colDef(header = "结局（标准值）")
-  ),
   height = 320, highlight = TRUE, defaultColDef = reactable::colDef(style = list(fontSize = "12px"))
 )
 ```
@@ -284,14 +276,6 @@ ae <- ae_raw %>%
 adsl <- pharmaverseadam::adsl
 reactable::reactable(
   head(adsl, 5) |> dplyr::select("USUBJID", "AGE", "SEX", "RACE", "ACTARM", "SAFFL"),
-  columns = list(
-    USUBJID = reactable::colDef(header = "受试者编号"),
-    AGE     = reactable::colDef(header = "年龄"),
-    SEX     = reactable::colDef(header = "性别"),
-    RACE    = reactable::colDef(header = "种族"),
-    ACTARM  = reactable::colDef(header = "实际治疗组"),
-    SAFFL   = reactable::colDef(header = "安全性人群")
-  ),
   height = 300, highlight = TRUE, defaultColDef = reactable::colDef(style = list(fontSize = "12px"))
 )
 ```
