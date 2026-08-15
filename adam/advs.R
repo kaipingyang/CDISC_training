@@ -404,7 +404,8 @@ advs <- advs %>%
   )
 
 ## ----r, message=FALSE, warning=FALSE------------------------------------------
-dir <- tempdir() # Specify the directory for saving the XPT file
+dir <- "adam/output" # Specify the directory for saving the XPT file
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 # Apply metadata and perform checks
 # 质控步骤：检查变量完整性和受控术语合规性，按规格排列列和行

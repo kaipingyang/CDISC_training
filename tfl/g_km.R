@@ -68,9 +68,38 @@ km_plot <- g_km(
   ylab = "Survival Probability"
 )
 
+# 图形字体统一为 Times New Roman（本机无该字体时回退到度量兼容的字体渲染）
+km_plot <- km_plot +
+  ggplot2::theme(text = ggplot2::element_text(family = "Times New Roman"))
+
 ## ----r export----------------------------------------------------------------
 # g_km 返回 ggplot 对象，用 ggsave 导出为 PNG
 dir <- tempdir()
 outfile <- file.path(dir, "g_km_os.png")
 ggsave(outfile, plot = km_plot, width = 10, height = 7, dpi = 150)
 cat("KM 生存曲线图已导出:", outfile, "\n")
+
+## ----r export-docx-----------------------------------------------------------
+# 可选：把图嵌进 Word 报告（officer 未安装时自动跳过），横版展示
+if (requireNamespace("officer", quietly = TRUE)) {
+  dir.create("tfl/output", showWarnings = FALSE, recursive = TRUE)
+  # Times New Roman 文本样式（标题 / 人群 / 脚注）
+  prop_title <- officer::fp_text(font.family = "Times New Roman", font.size = 14, bold = TRUE)
+  prop_text  <- officer::fp_text(font.family = "Times New Roman", font.size = 11)
+  officer::read_docx() %>%
+    officer::body_set_default_section(officer::prop_section(
+      page_size = officer::page_size(orient = "landscape")
+    )) %>%
+    officer::body_add_fpar(officer::fpar(officer::ftext(
+      "Figure 1. Kaplan-Meier Plot of Overall Survival", prop = prop_title),
+      fp_p = officer::fp_par(text.align = "center"))) %>%
+    officer::body_add_fpar(officer::fpar(officer::ftext(
+      "Population: All Randomized Subjects", prop = prop_text),
+      fp_p = officer::fp_par(text.align = "center"))) %>%
+    officer::body_add_img(src = outfile, width = 9, height = 5.5) %>%
+    officer::body_add_fpar(officer::fpar(officer::ftext(
+      paste0("Source: ADTTE. Censored subjects are indicated by tick marks; ",
+             "median survival time is annotated on each curve."), prop = prop_text))) %>%
+    print(target = "tfl/output/g_km.docx")
+  cat("Word 报告已导出: tfl/output/g_km.docx\n")
+}

@@ -53,7 +53,15 @@ adae <- adae %>%
 ## ----r layout----------------------------------------------------------------
 # 定义布局：按治疗组分列 → 顶层统计"发生任意 AE 的受试者数" →
 #           按 SOC 分层 → 层内统计"该 SOC 的受试者数" → 再按 PT 计数
-lyt <- basic_table(show_colcounts = TRUE) %>%
+lyt <- basic_table(
+  show_colcounts = TRUE,                             # 列标题显示每组 N
+  title = "Table 14.2.1 Summary of Adverse Events",  # 表题
+  subtitles = "Population: Safety Analysis Set",     # 分析人群
+  main_footer = paste0(                               # 脚注
+    "Source: ADAE, ADSL. Adverse events occurring during the treatment-emergent ",
+    "period (TRTEMFL = Y); MedDRA System Organ Class and Preferred Terms."
+  )
+) %>%
   split_cols_by("ACTARM") %>%
   # 顶层：发生至少一个 AE 的受试者总数
   summarize_num_patients(
@@ -92,3 +100,43 @@ print(tbl_sorted)
 dir <- tempdir()
 export_as_txt(tbl_sorted, file = file.path(dir, "t_adverse_events.txt"))
 cat("\n表格已导出:", file.path(dir, "t_adverse_events.txt"), "\n")
+
+## ----r export-docx-----------------------------------------------------------
+# 可选：导出为 Word 报告（rtables.officer 未安装时自动跳过）
+# 横版 + 三线表（booktabs）+ Times New Roman；
+# 标题/人群居中，脚注为表格下方的独立段落
+if (requireNamespace("rtables.officer", quietly = TRUE)) {
+  # 三线表 + Times New Roman 自定义主题（booktabs 只画三条横线）
+  booktabs_tnr <- function(flx, ...) {
+    flx %>%
+      flextable::theme_booktabs() %>%
+      flextable::font(fontname = "Times New Roman", part = "all")
+  }
+  dir.create("tfl/output", showWarnings = FALSE, recursive = TRUE)
+  docx_file <- "tfl/output/t_adverse_events.docx"
+  # 表格转 flextable：标题不进表格、去掉表内脚注、内容不加粗
+  ft <- rtables.officer::tt_to_flextable(tbl_sorted, theme = booktabs_tnr, titles_as_header = FALSE) %>%
+    flextable::delete_part(part = "footer") %>%
+    flextable::bold(part = "all", bold = FALSE)
+
+  # 标题/人群/脚注文本（单一来源：表对象上定义的 title/subtitles/main_footer）
+  ttls <- formatters::all_titles(tbl_sorted)
+  ftns <- formatters::all_footers(tbl_sorted)
+
+  prop_title <- officer::fp_text(font.family = "Times New Roman", font.size = 14, bold = TRUE)
+  prop_text  <- officer::fp_text(font.family = "Times New Roman", font.size = 11)
+  prop_foot  <- officer::fp_text(font.family = "Times New Roman", font.size = 9)
+
+  officer::read_docx() %>%
+    officer::body_set_default_section(officer::prop_section(
+      page_size = officer::page_size(orient = "landscape")
+    )) %>%
+    officer::body_add_fpar(officer::fpar(officer::ftext(ttls[1], prop = prop_title),
+      fp_p = officer::fp_par(text.align = "center"))) %>%
+    officer::body_add_fpar(officer::fpar(officer::ftext(paste(ttls[-1], collapse = " "), prop = prop_text),
+      fp_p = officer::fp_par(text.align = "center"))) %>%
+    flextable::body_add_flextable(ft) %>%
+    officer::body_add_fpar(officer::fpar(officer::ftext(paste(ftns, collapse = " "), prop = prop_foot))) %>%
+    print(target = docx_file)
+  cat("Word 报告已导出:", docx_file, "\n")
+}

@@ -32,3 +32,10 @@ docs/*_files/
 # Student practice copies (keep _template and setup.R, ignore per-student dirs)
 users/*/
 !users/_template/
+
+# Generated outputs (keep code, ignore products)
+sdtm/output/
+adam/output/
+tfl/output/
+
+.git-config.json

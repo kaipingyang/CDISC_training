@@ -198,5 +198,6 @@ adtte_final <- adtte_adsl_checked %>%
 
 # Write dataset to XPT file (optional)
 # 导出为 SAS 传输文件（.xpt），用于统计分析软件（SAS/R）读取
-dir <- tempdir()
+dir <- "adam/output"
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 xportr_write(adtte_final, file.path(dir, "adtte.xpt"))

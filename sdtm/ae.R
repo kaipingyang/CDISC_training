@@ -252,6 +252,7 @@ ae <- ae %>%
 
 ## ----r export--------------------------------------------------------------
 # 导出为 SAS 传输文件（.xpt），供下游 ADaM 或电子提交使用
-dir <- tempdir()
+dir <- "sdtm/output"
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 ae %>%
   xportr_write(file.path(dir, "ae.xpt"), domain = "AE")

@@ -302,6 +302,7 @@ dm <- dm %>%
 
 ## ----r export--------------------------------------------------------------
 # 导出为 SAS 传输文件（.xpt），供下游 ADaM 或电子提交使用
-dir <- tempdir()
+dir <- "sdtm/output"
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 dm %>%
   xportr_write(file.path(dir, "dm.xpt"), domain = "DM")

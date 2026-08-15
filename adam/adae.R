@@ -206,7 +206,8 @@ adae <- adae %>%
 # check_ct_data    : 验证受控术语值合规
 # order_cols/sort_by_key : 按规格排列列和行
 # xportr_* : 设置 SAS 格式属性并导出 .xpt
-dir <- tempdir() # Specify the directory for saving the XPT file
+dir <- "adam/output" # Specify the directory for saving the XPT file
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 adae %>%
   drop_unspec_vars(metacore) %>% # Drop unspecified variables from specs

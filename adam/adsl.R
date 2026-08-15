@@ -397,7 +397,8 @@ adsl <- adsl %>%
 # order_cols      : 按规格书定义的变量顺序排列列
 # sort_by_key     : 按规格书定义的排序键排列行
 # xportr_*        : 设置 SAS 格式（类型、长度、标签）并导出为 .xpt 文件
-dir <- tempdir() # Specify the directory for saving the XPT file
+dir <- "adam/output" # Specify the directory for saving the XPT file
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 adsl %>%
   check_variables(metacore) %>% # Check all variables specified are present and no more
