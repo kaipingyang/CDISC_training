@@ -19,7 +19,10 @@
 #      默认取 AVALU
 # =============================================================================
 
-options(teal.bs_theme = bslib::bs_theme(version = 5))
+# teal 的 footer（session info）在 bslib v5 主题下定位异常（static 且横跨顶部，
+# 会盖住模块 tab 栏）—— 通过主题规则固定到底部修复
+options(teal.bs_theme = bslib::bs_theme(version = 5) |>
+          bslib::bs_add_rules("footer#teal-footer { position: fixed; bottom: 0; left: 0; right: 0; z-index: 1030; }"))
 
 library(teal)
 library(teal.modules.general)   # tm_front_page / tm_data_table
