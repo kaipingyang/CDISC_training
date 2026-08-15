@@ -26,14 +26,38 @@ find_port <- function(start = 8789) {
 
 port <- find_port()
 
-# ── 打印访问地址 ──────────────────────────────────────────────────────────
-host <- Sys.getenv("PROXY_DOMAIN", "c3c-training.mediwei.com")
-base <- Sys.getenv("BASE_URL", "/u/c3c-training-kaiping-cdisc-training")
+# ── 自动探测平台代理配置（不写死任何域名/路径）─────────────────────────
+detect_proxy <- function() {
+  # 1) 环境变量（平台注入，最可靠）
+  domain <- Sys.getenv("PROXY_DOMAIN", unset = NA)
+  base   <- Sys.getenv("BASE_URL", unset = NA)
+  # 2) code-server 配置文件
+  if (is.na(domain)) {
+    cfg <- tryCatch(readLines("~/.config/code-server/config.yaml", warn = FALSE),
+                    error = function(e) character())
+    m <- grep("proxy-domain", cfg, value = TRUE)
+    if (length(m)) domain <- sub(".*proxy-domain:\\s*([^ ]+).*", "\\1", m[1])
+  }
+  # 3) code-server 进程启动参数
+  if (is.na(domain)) {
+    ps <- tryCatch(system2("ps", "aux", stdout = TRUE), error = function(e) character())
+    m <- grep("--proxy-domain", ps, value = TRUE)
+    if (length(m)) domain <- sub(".*--proxy-domain\\s+([^ ]+).*", "\\1", m[1])
+  }
+  list(domain = domain, base = base)
+}
+
+proxy <- detect_proxy()
 
 cat("\n============================================\n")
 cat("  App 已启动\n")
 cat("  本地访问: http://127.0.0.1:", port, "\n", sep = "")
-cat("  外部访问: https://", host, base, "/proxy/", port, "/\n", sep = "")
+if (!is.na(proxy$domain) && !is.na(proxy$base)) {
+  cat("  外部访问: https://", proxy$domain, proxy$base,
+      "/proxy/", port, "/\n", sep = "")
+} else {
+  cat("  （未检测到平台代理配置，仅本地可访问）\n")
+}
 cat("============================================\n\n")
 
 # ── 启动（根目录 app.R）──────────────────────────────────────────────────
