@@ -61,3 +61,19 @@ chat_server("my_chat", client = client, history = history_options(title = NULL))
 - teal 用 Bootstrap 5，导航是 `a[data-bs-toggle="tab"]`（不是 bs3 的 `data-toggle`）。
 - 表格输出不是 `<table>` 直出，而在 `[id$="table-with-settings"]` 卡片内（`teal.widgets`）；KM 图在 `[id$="plot-with-settings"]` 里的 `<img>`。
 - 同一个 app 实例被反复开关多个浏览器会话后可能"变钝"渲染不出——**每个模块用一个全新 app 实例**验证最可靠。
+
+### 9. 变量 label 丢失 → "Data passed has errors"（实测新增）
+- 症状：`tm_t_summary`（及其他模块）报 `Data passed has errors.`，页面无更多细节；
+  `tm_data_table` 等数据浏览模块正常 —— 只有分析类模块挂。
+- 根因：对 `pharmaverseadam` 等真实数据做 `as.factor()` 转换后，**变量的 label 属性丢失**
+  （`pharmaverseadam::adsl$SEX` 原有 label "Sex"，转换后为空），而 teal 的 transform
+  管线（qenv 重放）依赖变量 label。
+- 排查要点：`as.factor`/`df_explicit_na` 都会丢 label；`df_explicit_na` 不是元凶；
+  全量 `across(where(is.character), as.factor)` 也会因 label 丢失触发同一错误。
+- 修复：转换后恢复 label（用 attr 循环，`formatters::var_labels<-` 在 teal_data 的
+  within 环境里不可用）：
+```r
+for (.nm in names(ADSL)) attr(ADSL[[.nm]], "label") <-
+  attr(pharmaverseadam::adsl[[.nm]], "label")
+```
+- 验证：逐列二分（AGE 正常 / SEX 报错）+ 官方 tmc 数据对照（tmc 自带 label 正常）。

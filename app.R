@@ -47,17 +47,25 @@ data <- within(data, {
     )
   # ── ADaM ──
   ADSL <- pharmaverseadam::adsl |>
+    dplyr::filter(SAFFL == "Y") |>
     dplyr::mutate(
       # 显式 levels 控制治疗组列顺序（默认字母序 High 在前，与 tfl/ 脚本不一致）
       ACTARM = factor(ACTARM, levels = c("Placebo", "Xanomeline High Dose", "Xanomeline Low Dose")),
       dplyr::across(dplyr::any_of(c("SEX", "RACE", "AGEGR1", "SAFFL")), as.factor)
     )
+  # ★ as.factor 会丢失变量 label，而 teal transform 依赖 label —— 必须恢复，
+  #   否则模块报 "Data passed has errors"（逐列二分定位到的根因）
+  for (.nm in names(ADSL)) attr(ADSL[[.nm]], "label") <-
+    attr(pharmaverseadam::adsl[[.nm]], "label")
   ADAE <- pharmaverseadam::adae |>
+    dplyr::filter(TRTEMFL == "Y", USUBJID %in% ADSL$USUBJID) |>
     dplyr::mutate(
       # 分子分母 levels 对齐（与 tfl/t_adverse_events.R 同理）
       ACTARM = factor(ACTARM, levels = levels(ADSL$ACTARM)),
       dplyr::across(dplyr::any_of(c("AEBODSYS", "AEDECOD", "AESEV", "TRTEMFL")), as.factor)
     )
+  for (.nm in names(ADAE)) attr(ADAE[[.nm]], "label") <-
+    attr(pharmaverseadam::adae[[.nm]], "label")
   ADTTE <- pharmaverseadam::adtte_onco |>
     dplyr::filter(PARAMCD == "OS") |>
     dplyr::mutate(
@@ -66,6 +74,8 @@ data <- within(data, {
       AVALU    = "Days",                    # adtte_onco 缺 AVALU，补上（tm_g_km 默认取它）
       is_event = as.integer(CNSR == 0)      # tm_g_km 需要事件标志（CNSR 是 integer）
     )
+  for (.nm in names(ADTTE)) attr(ADTTE[[.nm]], "label") <-
+    attr(pharmaverseadam::adtte_onco[[.nm]], "label")
 })
 # join keys：ADSL 是 ADaM 主表；SDTM 域（DM/AE/VS）同样按 USUBJID 关联（default 不含 SDTM 域，需显式加）
 join_keys(data) <- c(
