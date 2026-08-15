@@ -15,7 +15,7 @@ format:
     height: 900
     transition: fade
     transition-speed: fast
-    code-block-height: 560px
+    code-block-height: 400px
     footer: "CDISC 数据集生成实战 · pharmaverse · Claude Code"
 execute:
   echo: true
@@ -132,26 +132,17 @@ lang: zh
 
 ## 原始采集数据长什么样
 
-`pharmaverseraw::ae_raw` —— 字段名和取值都是"人话"（EDC 直接导出的样子）：
+`pharmaverseraw::ae_raw` —— 字段名与取值保持 EDC 采集的原始形态（如 "Mild Adverse Event"）：
 
 ```{r}
 #| eval: TRUE
 #| echo: FALSE
 #| message: FALSE
-cat("DEBUG_LIBS:", paste(.libPaths(), collapse = " || "), "\n")
-cat("DEBUG_R_LIBS:", Sys.getenv("R_LIBS"), "\n")
 library(reactable); library(dplyr)
 ae_raw <- pharmaverseraw::ae_raw
 reactable::reactable(
   head(ae_raw, 5) |> dplyr::select("STUDY", "PATNUM", "IT.AETERM", "IT.AESEV", "AEOUTCOME"),
-  columns = list(
-    STUDY      = reactable::colDef(header = "研究"),
-    PATNUM     = reactable::colDef(header = "受试者"),
-    IT.AETERM  = reactable::colDef(header = "不良事件（人话）"),
-    IT.AESEV   = reactable::colDef(header = "严重程度（人话）"),
-    AEOUTCOME  = reactable::colDef(header = "结局（人话）")
-  ),
-  height = 340, highlight = TRUE
+  height = 320, highlight = TRUE, defaultColDef = reactable::colDef(style = list(fontSize = "12px"))
 )
 ```
 
@@ -178,7 +169,7 @@ reactable::reactable(
     AESEV   = reactable::colDef(header = "严重程度（标准值）"),
     AEOUT   = reactable::colDef(header = "结局（标准值）")
   ),
-  height = 340, highlight = TRUE
+  height = 320, highlight = TRUE, defaultColDef = reactable::colDef(style = list(fontSize = "12px"))
 )
 ```
 
@@ -214,8 +205,15 @@ dm <- dm_raw %>%
 source("sdtm/dm.R")   # 生成 DM 域，导出 dm.xpt
 ```
 
-**产物**：符合 SDTM 规范的 DM 数据集（STUDYID / USUBJID / AGE / SEX / RACE…），
-导出为 `dm.xpt`（SAS 传输文件，写入 `sdtm/output/`）。
+**产物**：符合 SDTM 规范的 DM 数据集（每人一行：STUDYID / USUBJID / AGE / SEX / RACE / ARM…），
+导出为 `dm.xpt`（SAS 传输文件）到 `sdtm/output/`。
+
+查看产物：
+
+```r
+haven::read_xpt("sdtm/output/dm.xpt") |> head()
+# 或打开交互展示 app："SDTM DM 数据" 模块
+```
 
 ::: {.callout-important}
 **踩坑：受控术语表要齐**。`assign_ct` 用的 codelist（如 `C66731` 性别）必须在
@@ -300,7 +298,7 @@ reactable::reactable(
     ACTARM  = reactable::colDef(header = "实际治疗组"),
     SAFFL   = reactable::colDef(header = "安全性人群")
   ),
-  height = 300, highlight = TRUE
+  height = 300, highlight = TRUE, defaultColDef = reactable::colDef(style = list(fontSize = "12px"))
 )
 ```
 
@@ -430,7 +428,7 @@ lyt2 <- basic_table(show_colcounts = TRUE) %>%
 tbl_ae <- build_table(lyt2, df = adae2, alt_counts_df = adsl2) %>%
   prune_table() %>%
   sort_at_path(path = c("AEBODSYS", "*", "AEDECOD"), scorefun = score_occurrences)
-rtables::as_html(head(tbl_ae, 12))
+rtables::as_html(head(tbl_ae, 8))
 ```
 
 ::: {.callout-important}
