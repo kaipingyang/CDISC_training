@@ -1,0 +1,5 @@
+/* 代码块高度限制：quarto 的 code-block-height 选项在 revealjs 下不生效，
+   默认 80vh 会让短代码块占满大半屏并把后续内容挤出视口 */
+.reveal pre {
+  max-height: 420px !important;
+}

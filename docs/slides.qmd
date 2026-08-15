@@ -6,6 +6,7 @@ date: today
 format:
   revealjs:
     theme: [default, theme.scss]
+    css: extra.css
     slide-number: c/t
     navigation-mode: linear
     embed-resources: true
@@ -190,13 +191,13 @@ reactable::reactable(
 ```r
 dm <- dm_raw %>%
   generate_oak_id_vars(pat_var = "PATNUM", raw_src = "dm_raw") %>%
-  assign_no_ct(raw_dat = dm_raw, raw_var = "IT.AGE", tgt_var = "AGE",
-               id_vars = oak_id_vars()) %>%          # 年龄：原样复制
-  assign_ct(raw_dat = dm_raw, raw_var = "IT.SEX", tgt_var = "SEX",
-            ct_spec = study_ct, ct_clst = "C66731",
-            id_vars = oak_id_vars()) %>%              # 性别：按 CT 表转换
+  assign_no_ct(raw_dat = dm_raw, raw_var = "IT.AGE",
+               tgt_var = "AGE", id_vars = oak_id_vars()) %>%
+  assign_ct(raw_dat = dm_raw, raw_var = "IT.SEX",
+            tgt_var = "SEX", ct_spec = study_ct,
+            ct_clst = "C66731", id_vars = oak_id_vars()) %>%
   hardcode_ct(tgt_var = "DOMAIN", value = "DM",
-              id_vars = oak_id_vars())                # 域代码：固定值
+              id_vars = oak_id_vars())
 ```
 
 ## 运行与产物
@@ -205,20 +206,12 @@ dm <- dm_raw %>%
 source("sdtm/dm.R")   # 生成 DM 域，导出 dm.xpt
 ```
 
-**产物**：符合 SDTM 规范的 DM 数据集（每人一行：STUDYID / USUBJID / AGE / SEX / RACE / ARM…），
-导出为 `dm.xpt`（SAS 传输文件）到 `sdtm/output/`。
-
-查看产物：
-
-```r
-haven::read_xpt("sdtm/output/dm.xpt") |> head()
-# 或打开交互展示 app："SDTM DM 数据" 模块
-```
+**产物**：符合 SDTM 规范的 DM 数据集（每人一行），导出为 `dm.xpt` 到 `sdtm/output/`。
+查看：`haven::read_xpt("sdtm/output/dm.xpt")`，或交互 app 的 "SDTM DM 数据" 模块。
 
 ::: {.callout-important}
-**踩坑：受控术语表要齐**。`assign_ct` 用的 codelist（如 `C66731` 性别）必须在
-`metadata/sdtm_ct.csv` 里有对应条目，否则报 `ct_clst must be equal to one of…`。
-本项目的 CT 表已按 NCI-EVS 官方值补全。
+**踩坑：受控术语表要齐**。`assign_ct` 的 codelist（如 `C66731`）必须在
+`metadata/sdtm_ct.csv` 里有条目，否则报 `ct_clst must be equal to one of…`。
 :::
 
 ## 动手练习：生成 VS 域 {background-opacity="0.04"}
@@ -233,15 +226,15 @@ study_ct <- read.csv("metadata/sdtm_ct.csv")
 
 vs <- vs_raw %>%
   generate_oak_id_vars(pat_var = "PATNUM", raw_src = "vs_raw") %>%
-  # TODO 1: 映射 VSTESTCD（原始 IT.VSTESTCD → 目标 VSTESTCD，用 assign_no_ct）
-  # 👉 在这里补一段 assign_no_ct(...)
-  # TODO 2: 映射 VSTEST（原始 IT.VSTEST → 目标 VSTEST，用 assign_no_ct）
-  # 👉 在这里补一段 assign_no_ct(...)
+  # TODO 1: 映射 VSTESTCD（用 assign_no_ct）
+  # 👉 补一段 assign_no_ct(...)
+  # TODO 2: 映射 VSTEST（用 assign_no_ct）
+  # 👉 补一段 assign_no_ct(...)
   identity()
 ```
 
 ::: {.callout-tip}
-不会写就问 Claude Code："帮我补全这两个 TODO"。完整答案见 `sdtm/vs.R`。
+不会写就问 Claude Code："帮我补全这两个 TODO"。答案见 `sdtm/vs.R`。
 :::
 
 ## 进阶：生成 AE 域（复杂域）
@@ -252,16 +245,17 @@ vs <- vs_raw %>%
 ```r
 ae <- ae_raw %>%
   generate_oak_id_vars(pat_var = "PATNUM", raw_src = "ae_raw") %>%
-  assign_ct(raw_dat = ae_raw, raw_var = "AEOUTCOME", tgt_var = "AEOUT",
-            ct_spec = study_ct, ct_clst = "C66768", id_vars = oak_id_vars()) %>%
-  assign_ct(raw_dat = ae_raw, raw_var = "IT.AESEV", tgt_var = "AESEV",
-            ct_spec = study_ct, ct_clst = "C66769", id_vars = oak_id_vars()) %>%
-  derive_vars_dtm(dtc = "AEDTC")          # ISO 8601 日期解析
+  assign_ct(raw_dat = ae_raw, raw_var = "AEOUTCOME",
+            tgt_var = "AEOUT", ct_spec = study_ct,
+            ct_clst = "C66768", id_vars = oak_id_vars()) %>%
+  assign_ct(raw_dat = ae_raw, raw_var = "IT.AESEV",
+            tgt_var = "AESEV", ct_spec = study_ct,
+            ct_clst = "C66769", id_vars = oak_id_vars()) %>%
+  derive_vars_dtm(dtc = "AEDTC")   # ISO 8601 日期解析
 ```
 
 ::: {.callout-note}
-完整实现见 `sdtm/ae.R`（含 SUPPAE 补充域处理）。先把 DM 和 VS 练熟，
-再挑战这个域。
+完整实现见 `sdtm/ae.R`（含 SUPPAE）。先练熟 DM 和 VS，再挑战这个域。
 :::
 
 ## 课时 1 小结
@@ -410,6 +404,7 @@ rtables::as_html(build_table(lyt, df = adsl))
 
 ## 产物 2：AE 汇总表（分子分母分离）
 
+::: {style="transform: scale(0.88); transform-origin: top left; width: 100%;"}
 ```{r}
 #| eval: TRUE
 #| echo: FALSE
@@ -430,19 +425,10 @@ tbl_ae <- build_table(lyt2, df = adae2, alt_counts_df = adsl2) %>%
   sort_at_path(path = c("AEBODSYS", "*", "AEDECOD"), scorefun = score_occurrences)
 rtables::as_html(head(tbl_ae, 8))
 ```
-
-::: {.callout-important}
-**AE 表分母口诀：分子看 ADAE，分母看 ADSL。**
-
-ADAE 里**只有发生过 AE 的人**，没发生的不在里面。
-所以百分比分母（每组总人数 N）必须单独从 ADSL 传：
-
-```r
-build_table(lyt, df = adae, alt_counts_df = adsl)  # ← 分母
-```
-
-漏了它 → 分母用 ADAE 人数 → 百分比虚高。
 :::
+
+**AE 表分母口诀：分子看 ADAE，分母看 ADSL** —— `build_table(…, alt_counts_df = adsl)`，漏了百分比会虚高。
+
 
 ## 产物 3：KM 生存曲线图
 
@@ -472,9 +458,9 @@ tern::g_km(
 library(tern); library(dplyr); library(ggplot2)
 
 anl <- pharmaverseadam::adtte_onco %>%
-  # TODO 1: 把 PARAMCD 从 "OS" 改成 "PFS"
-  filter(PARAMCD == "OS") %>%              # 👉 改这里
-  mutate(ARM = factor(ARM), is_event = (CNSR == 0))
+  filter(PARAMCD == "OS") %>%   # TODO 1: 改成 "PFS" 👉
+  mutate(ARM = factor(ARM),
+         is_event = (CNSR == 0))
 
 g_km(anl,
      variables = list(tte = "AVAL", is_event = "is_event", arm = "ARM"),

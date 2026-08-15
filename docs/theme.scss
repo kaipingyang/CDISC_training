@@ -339,3 +339,8 @@ $presentation-block-margin: 12px;
   background: rgba(0,122,255,0.18) !important;
   backdrop-filter: blur(8px);
 }
+
+/* 代码块高度限制（quarto 的 code-block-height 选项在 revealjs 下不生效） */
+.reveal pre {
+  max-height: 420px;
+}
