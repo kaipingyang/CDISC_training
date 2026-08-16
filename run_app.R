@@ -61,4 +61,10 @@ if (!is.na(proxy$domain) && !is.na(proxy$base)) {
 cat("============================================\n\n")
 
 # ── 启动（根目录 app.R）──────────────────────────────────────────────────
-shiny::runApp(".", host = "0.0.0.0", port = port, launch.browser = FALSE)
+# 直接 Rscript 运行（sys.nframe()==0）时自动启动；
+# 被外部 runApp/Posit 扩展 source 时不嵌套启动（避免端口错乱）
+if (sys.nframe() == 0) {
+  shiny::runApp(".", host = "0.0.0.0", port = port, launch.browser = FALSE)
+} else {
+  cat("（检测到被外部调用 —— 由外部 runApp 管理端口，本脚本不启动）\n")
+}

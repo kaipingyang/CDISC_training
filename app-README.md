@@ -16,15 +16,24 @@ Front page
     └── KM 生存曲线     （tm_g_km，对应 tfl/g_km.R）
 ```
 
-## 运行
+## 运行（两种方式）
+
+**方式 1：终端直接启动（自动打印平台代理地址）**
 
 ```r
 renv::restore()            # 首次：恢复环境（含 teal 系列）
-Rscript run_app.R          # 一键启动（自动监听 0.0.0.0 + 打印访问 URL）
+Rscript run_app.R          # 自动监听 0.0.0.0 + 端口顺延 + 打印访问 URL
 ```
 
-启动后按终端打印的地址访问：本地 `http://127.0.0.1:<port>`，
+按终端打印的地址访问：本地 `http://127.0.0.1:<port>`，
 外部（PharmaROSE 平台）`https://c3c-training.mediwei.com<BASE_URL>/proxy/<port>/`。
+
+**方式 2：Posit Shiny 扩展启动（扩展管理端口和地址）**
+
+在 VS Code 里对 `app.R` 点击 "Run Shiny App"（扩展自动用
+`runShinyApp.R` 启动并显示访问地址）。**注意：用扩展时必须选 `app.R`**
+（标准 shinyApp 结尾），不要选 `run_app.R`（它会提示"检测到被外部调用"
+而不启动，扩展会报 "did not return a shiny.appobj object"）。
 
 > ⚠️ 注意：**不要**把 `app.R` 的内容逐行粘贴到 R 控制台执行 ——
 > 脚本大量使用多行管道（`|>`）和跨行调用，逐行执行会全部报语法错误。
