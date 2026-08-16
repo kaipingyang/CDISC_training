@@ -20,7 +20,7 @@
 #   - metadata/safety_specs.xlsx : ADaM 规格书
 #
 # 输出文件：
-#   - adae.xpt（SAS 传输文件，写入 tempdir()）
+#   - adae.xpt（SAS 传输文件，写入 adam/output/）
 #
 # 关键概念说明：
 #   TRTEMFL：治疗期内发生的不良事件标志（"Treatment-Emergent"），是安全性分析的核心
@@ -31,8 +31,10 @@
 # =============================================================================
 
 # =============================================================================
-# 【练习版】按 # TODO 提示填空。填不出就问 Claude Code："帮我补全这个 TODO"。
-# 参考答案：adam/adae.R（完整版，别改它）—— 先自己填，卡住再看。
+# 【练习版】按 # TODO 提示填空。填不出就问 Claude Code："帮我补全这个 TODO"——
+# 练习模式只会给提示，不会直接读答案，也不会替你写完整版。
+# 写完自查：跟 Claude Code 说"我写完了，帮我对照检查"，它会逐条说明差异。
+# 项目根的 sdtm/ adam/ tfl/ 是完整答案脚本（供对照，勿改），练习时不要读/改它们。
 # =============================================================================
 
 ## ----r setup, message=FALSE, warning=FALSE, results='hold'--------------------
@@ -94,13 +96,14 @@ adae <- ae %>%
 # highest_imputation = "M" 允许对缺失月份进行填补
 # flag_imputation = "auto" 自动创建 AENDTF 变量记录填补标志
 adae <- adae %>%
-  derive_vars_dt(
-    new_vars_prefix = "AEN",
-    dtc = AEENDTC,
-    date_imputation = "last",
-    highest_imputation = "M", # imputation is performed on missing days or months
-    flag_imputation = "auto" # to automatically create AENDTF variable
-  ) %>%
+  # TODO 2: 派生分析结束日期 AENDT（并自动创建填补标志 AENDTF）
+  #   用 derive_vars_dt 把 AEENDTC 转成日期；不完整日期（缺日/缺月）需要"填补"：
+  #     - new_vars_prefix = "AEN"，dtc = AEENDTC
+  #     - date_imputation = "last"（缺日时填月末）
+  #     - highest_imputation = "M"（允许对缺失月份填补）
+  #     - flag_imputation = "auto"（自动生成 AENDTF 标志变量，记录填补情况）
+  #   👉 参考紧接着下面 ASTDT 的 derive_vars_dt 写法补上，然后接 %>%
+  identity() %>%
   derive_vars_dt(
     new_vars_prefix = "AST",
     dtc = AESTDTC,
@@ -159,7 +162,7 @@ adae <- adae %>%
 # TRTEMFL：治疗期内新发或加重的不良事件（首次用药后开始，或用药前存在但用药后加重）
 # ONTRTFL：在治疗期间活跃的不良事件（ref_end_window=30表示末次用药后30天内也算）
 adae <- adae %>%
-  # TODO 2: 标记治疗期间不良事件 TRTEMFL（Treatment-Emergent AE Flag）
+  # TODO 3: 标记治疗期间不良事件 TRTEMFL（Treatment-Emergent AE Flag）
   #   用 derive_var_trtemfl，判断 AE 开始日 ASTDT 是否落在治疗期 TRTSDT~TRTEDT 内。
   #   要点：
   #     - start_date     = ASTDT，end_date = AENDT
@@ -216,7 +219,8 @@ adae <- adae %>%
 # check_ct_data    : 验证受控术语值合规
 # order_cols/sort_by_key : 按规格排列列和行
 # xportr_* : 设置 SAS 格式属性并导出 .xpt
-dir <- tempdir() # Specify the directory for saving the XPT file
+dir <- "adam/output" # Specify the directory for saving the XPT file
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 adae %>%
   drop_unspec_vars(metacore) %>% # Drop unspecified variables from specs

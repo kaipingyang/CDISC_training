@@ -16,6 +16,7 @@
 #
 # 输出文件：
 #   - t_demographic.txt（表格文本，写入 tempdir()）
+#   - t_demographic.docx（Word 报告，写入 tfl/output/，rtables.officer 已安装时）
 #
 # 关键概念说明（给不熟悉 R 的临床数据人员）：
 #   Layout 与 Data 分离：先用 basic_table() 声明"表长什么样"（分几列、
@@ -29,8 +30,10 @@
 # =============================================================================
 
 # =============================================================================
-# 【练习版】按 # TODO 提示填空。填不出就问 Claude Code："帮我补全这个 TODO"。
-# 参考答案：tfl/t_demographic.R（完整版，别改它）—— 先自己填，卡住再看。
+# 【练习版】按 # TODO 提示填空。填不出就问 Claude Code："帮我补全这个 TODO"——
+# 练习模式只会给提示，不会直接读答案，也不会替你写完整版。
+# 写完自查：跟 Claude Code 说"我写完了，帮我对照检查"，它会逐条说明差异。
+# 项目根的 sdtm/ adam/ tfl/ 是完整答案脚本（供对照，勿改），练习时不要读/改它们。
 # =============================================================================
 
 ## ----r setup, message=FALSE, warning=FALSE-----------------------------------
@@ -66,8 +69,10 @@ lyt <- basic_table(show_colcounts = TRUE) %>%       # show_colcounts: 列标题�
   # TODO 1: 按治疗组 ACTARM 分列（每个治疗组一列）
   # 👉 在这里补 split_cols_by("...")，然后接 %>%
   identity() %>%                                     # 占位：填好上面 TODO 后删掉这行 identity()
-  add_overall_col("All Patients") %>%                # 追加"合计"列
-  # TODO 2: 分析 4 个人口学变量 AGE / AGEGR1 / SEX / RACE。
+  # TODO 2: 追加"合计"列（汇总所有受试者的一列）
+  # 👉 在这里补 add_overall_col("All Patients")，然后接 %>%
+  identity() %>%                                     # 占位：填好上面 TODO 后删掉这行 identity()
+  # TODO 3: 分析 4 个人口学变量 AGE / AGEGR1 / SEX / RACE。
   #   analyze_vars 会对连续变量算 n/Mean/SD/Median/Range，对分类变量算计数和百分比。
   # 👉 在这里补 analyze_vars(vars = c(...), .stats = c(...))，替换下面的 identity()
   identity()                                         # 占位：填好上面 TODO 后删掉这行 identity()

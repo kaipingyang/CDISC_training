@@ -20,7 +20,7 @@
 #   - metadata/safety_specs.xlsx : ADaM 规格书
 #
 # 输出文件：
-#   - adae.xpt（SAS 传输文件，写入 tempdir()）
+#   - adae.xpt（SAS 传输文件，写入 adam/output/）
 #
 # 关键概念说明：
 #   TRTEMFL：治疗期内发生的不良事件标志（"Treatment-Emergent"），是安全性分析的核心

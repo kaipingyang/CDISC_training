@@ -1,6 +1,6 @@
 # ── 初始化某学员的练习区 ─────────────────────────────────────────────────────
 # 把 users/_template/ 的挖空 starter（sdtm/adam/tfl 三个子目录）复制到
-# users/<名字>/，供学员填 TODO 练习。答案在项目根的 sdtm/ adam/ tfl/。
+# users/<名字>/，供学员填 TODO 练习。练习模式只给提示不读答案，写完再对照自查。
 #
 # 用法（从项目根目录运行）：
 #   Rscript users/setup.R zhangsan
@@ -35,5 +35,5 @@ cat(sprintf("\n✓ 练习区就绪：%s/\n", dst))
 cat("  子目录：sdtm/  adam/  tfl/（各含挖空 starter）\n\n")
 cat("开始练习：\n")
 cat(sprintf("  1. 打开 %s/sdtm/ae.R，按 # TODO 提示填空\n", dst))
-cat("  2. 填不出就问 Claude Code：\"帮我补全这个 TODO\"\n")
-cat(sprintf("  3. 跑通后对照答案：sdtm/ae.R（完整版，别改它）\n\n"))
+cat("  2. 填不出就问 Claude Code：\"帮我补全这个 TODO\"（练习模式：只给提示，不读答案）\n")
+cat(sprintf("  3. 写完自查：跟 Claude Code 说\"我写完了，帮我对照检查\"，再对照 sdtm/ae.R（完整版，别改它）\n\n"))

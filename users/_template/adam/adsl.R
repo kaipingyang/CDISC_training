@@ -24,7 +24,7 @@
 #   - metadata/safety_specs.xlsx : ADaM 规格书（定义变量、受控术语、排序等）
 #
 # 输出文件：
-#   - adsl.xpt（SAS 传输文件，写入 tempdir()）
+#   - adsl.xpt（SAS 传输文件，写入 adam/output/）
 #
 # 关键概念说明：
 #   ADSL 是所有 ADaM 分析的起点，包含以下关键变量类别：
@@ -36,8 +36,10 @@
 # =============================================================================
 
 # =============================================================================
-# 【练习版】按 # TODO 提示填空。填不出就问 Claude Code："帮我补全这个 TODO"。
-# 参考答案：adam/adsl.R（完整版，别改它）—— 先自己填，卡住再看。
+# 【练习版】按 # TODO 提示填空。填不出就问 Claude Code："帮我补全这个 TODO"——
+# 练习模式只会给提示，不会直接读答案，也不会替你写完整版。
+# 写完自查：跟 Claude Code 说"我写完了，帮我对照检查"，它会逐条说明差异。
+# 项目根的 sdtm/ adam/ tfl/ 是完整答案脚本（供对照，勿改），练习时不要读/改它们。
 # =============================================================================
 
 ## ----r setup, message=FALSE, warning=FALSE, results='hold'--------------------
@@ -401,7 +403,8 @@ adsl <- adsl %>%
 # order_cols      : 按规格书定义的变量顺序排列列
 # sort_by_key     : 按规格书定义的排序键排列行
 # xportr_*        : 设置 SAS 格式（类型、长度、标签）并导出为 .xpt 文件
-dir <- tempdir() # Specify the directory for saving the XPT file
+dir <- "adam/output" # Specify the directory for saving the XPT file
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 adsl %>%
   check_variables(metacore) %>% # Check all variables specified are present and no more

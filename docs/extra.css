@@ -1,7 +1,23 @@
-/* 代码块高度限制：quarto 的 code-block-height 选项在 revealjs 下不生效，
-   默认 80vh 会让短代码块占满大半屏并把后续内容挤出视口 */
+/* ============================================================
+   slides.qmd 专用样式补丁（revealjs）
+   ============================================================ */
+
+/* 代码块高度上限：quarto 的 code-block-height 选项会生成 code 上的
+   max-height 规则，与 .reveal div.sourceCode pre code 的 min-height:100%
+   冲突（min > max 时 max 失效），导致短代码块被拉成整页高。高度控制
+   统一收敛到 pre 这一层。 */
 .reveal pre {
   max-height: 420px !important;
+  /* 主题的 pre 是 content-box：左右 padding 28px×2 会把总宽度撑出容器
+     57px，导致每个代码块都出现横向滚动条并超出幻灯片右缘 */
+  box-sizing: border-box;
+}
+
+/* 撤销 quarto 对 code 的 min-height:100% 拉伸：
+   它把短代码块撑成 900px（整页高），内容只占顶部，下方全是空白。
+   min-height:0 让代码块按内容自适应，由外层 pre 的 max-height 兜底。 */
+.reveal div.sourceCode pre code {
+  min-height: 0 !important;
 }
 
 /* reactable 数据表格统一卡片样式（与 rtables as_html 表格一致） */
@@ -10,4 +26,25 @@
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+}
+
+/* reactable 表头：继承 reveal 主题后高达 34px，与 12px 单元格反差过大。
+   收敛到 14px，与单元格形成 14/12 的紧凑比例。 */
+.reactable .rt-th {
+  font-size: 14px !important;
+}
+
+/* 图片：quarto 自动给图片加 r-stretch（reveal 的自动拉伸），其高度计算有
+   时序问题（跳到某页时可能算出 height: 0 导致图片不显示）。改回按宽度
+   等比渲染，由 SVG 自带的固有尺寸决定高度，行为确定。 */
+.reveal img.r-stretch {
+  height: auto !important;
+}
+
+/* AE 汇总表（产物 2）：表格内容宽 1791px，超出容器 1600px 会产生横向滚动条。
+   qmd 中已对该表用 scale(0.88) 缩放，这里让滚动容器不出现滚动条，
+   缩放后的表格（1576px）正好放得下。 */
+.cell-output-display,
+.rtables-container {
+  overflow: visible !important;
 }

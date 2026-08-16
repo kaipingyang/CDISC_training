@@ -16,6 +16,7 @@
 #
 # 输出文件：
 #   - t_demographic.txt（表格文本，写入 tempdir()）
+#   - t_demographic.docx（Word 报告，写入 tfl/output/，rtables.officer 已安装时）
 #
 # 关键概念说明（给不熟悉 R 的临床数据人员）：
 #   Layout 与 Data 分离：先用 basic_table() 声明"表长什么样"（分几列、

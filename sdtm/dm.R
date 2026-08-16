@@ -18,7 +18,7 @@
 #   - metadata/sdtm_ct.csv    : CDISC 受控术语对照表
 #
 # 输出文件：
-#   - dm.xpt（SAS 传输文件，写入 tempdir()）
+#   - dm.xpt（SAS 传输文件，写入 sdtm/output/）
 #
 # 关键概念说明（给不熟悉R的临床数据人员）：
 #   SDTM 映射：把 EDC 收集的原始变量名，按 CDISC 规定重命名并转换成标准格式

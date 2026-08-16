@@ -4,7 +4,8 @@
 # 功能说明：
 #   在 SDTM VS 域基础上构建 ADVS，添加分析所需的派生变量，包括：
 #   分析日期（ADT/ADY）、参数化指标（PARAMCD/PARAM）、衍生参数（MAP均动脉压/BMI/BSA）、
-#   基线值（BASE）、变化量（CHG）、百分变化（PCHG）、正常范围标志（ANRIND）等。
+#   治疗结束末次值（LOV）、基线值（BASE）、变化量（CHG）、百分变化（PCHG）、
+#   正常范围标志（ANRIND）等。
 #
 # 使用的包：
 #   - admiral         : ADaM 构建核心工具包
@@ -19,7 +20,7 @@
 #   - metadata/safety_specs.xlsx : ADaM 规格书
 #
 # 输出文件：
-#   - advs.xpt（SAS 传输文件，写入 tempdir()）
+#   - advs.xpt（SAS 传输文件，写入 adam/output/）
 #
 # 关键概念说明：
 #   PARAMCD/PARAM：ADaM 的参数化标识，将 VSTESTCD（如"SYSBP"）映射为分析参数
@@ -90,20 +91,43 @@ advs <- advs %>%
     source_vars = exprs(ADT)
   )
 
+## ----r eval=TRUE--------------------------------------------------------------
+# 创建分析访视变量 AVISIT/AVISITN 和时间点变量 ATPT/ATPTN
+# 筛查/非计划/随访访视不计入主要分析（设为 NA），只保留正式访视
+# 注：必须在 MAP/BMI/BSA 等衍生参数之前创建——衍生参数行按 by_vars 继承这些变量，
+# 后续 LOV 派生依赖 AVISITN 判断治疗结束访视
+advs <- advs %>%
+  mutate(
+    ATPTN = VSTPTNUM,
+    ATPT = VSTPT,
+    AVISIT = case_when(
+      str_detect(VISIT, "SCREEN|UNSCHED|RETRIEVAL|AMBUL") ~ NA_character_,
+      !is.na(VISIT) ~ str_to_title(VISIT),
+      TRUE ~ NA_character_
+    ),
+    AVISITN = as.numeric(case_when(
+      VISIT == "BASELINE" ~ "0",
+      str_detect(VISIT, "WEEK") ~ str_trim(str_replace(VISIT, "WEEK", "")),
+      TRUE ~ NA_character_
+    ))
+  )
+
 ## ----r eval=TRUE, include=FALSE-----------------------------------------------
-# 参数查找表：将 SDTM 的 VSTESTCD 映射为 ADaM 的 PARAMCD/PARAM/PARAMN
+# 参数查找表：将 SDTM 的 VSTESTCD 映射为 ADaM 的 PARAMCD
 # 包含6个原始指标和3个衍生指标（MAP、BMI、BSA）
+# 注：PARAM/PARAMN 的描述与编码由脚本末尾 create_var_from_codelist
+# 从规格书受控术语自动生成，无需在此定义（此表仅负责 PARAMCD 映射）
 param_lookup <- tibble::tribble(
-  ~VSTESTCD, ~PARAMCD, ~PARAM, ~PARAMN,
-  "SYSBP", "SYSBP", " Systolic Blood Pressure (mmHg)", 1,
-  "DIABP", "DIABP", "Diastolic Blood Pressure (mmHg)", 2,
-  "PULSE", "PULSE", "Pulse Rate (beats/min)", 3,
-  "WEIGHT", "WEIGHT", "Weight (kg)", 4,
-  "HEIGHT", "HEIGHT", "Height (cm)", 5,
-  "TEMP", "TEMP", "Temperature (C)", 6,
-  "MAP", "MAP", "Mean Arterial Pressure (mmHg)", 7,
-  "BMI", "BMI", "Body Mass Index(kg/m^2)", 8,
-  "BSA", "BSA", "Body Surface Area(m^2)", 9
+  ~VSTESTCD, ~PARAMCD,
+  "SYSBP", "SYSBP",
+  "DIABP", "DIABP",
+  "PULSE", "PULSE",
+  "WEIGHT", "WEIGHT",
+  "HEIGHT", "HEIGHT",
+  "TEMP", "TEMP",
+  "MAP", "MAP",
+  "BMI", "BMI",
+  "BSA", "BSA"
 )
 attr(param_lookup$VSTESTCD, "label") <- "Vital Signs Test Short Name"
 
@@ -135,7 +159,7 @@ advs <- advs %>%
 # derive_param_map 自动查找同一受试者同一时间点的 SYSBP 和 DIABP 记录来计算
 advs <- advs %>%
   derive_param_map(
-    by_vars = exprs(STUDYID, USUBJID, !!!adsl_vars, VISIT, VISITNUM, ADT, ADY, VSTPT, VSTPTNUM, AVALU), # Other variables than the defined ones here won't be populated
+    by_vars = exprs(STUDYID, USUBJID, !!!adsl_vars, VISIT, VISITNUM, ADT, ADY, VSTPT, VSTPTNUM, AVALU, AVISIT, AVISITN, ATPT, ATPTN), # Other variables than the defined ones here won't be populated
     set_values_to = exprs(PARAMCD = "MAP"),
     get_unit_expr = VSSTRESU,
     filter = VSSTAT != "NOT DONE" | is.na(VSSTAT),
@@ -150,7 +174,7 @@ advs <- advs %>%
 # constant_parameters = "HEIGHT" 表示身高在同一受试者内视为常数（不随访视变化）
 advs <- advs %>%
   derive_param_computed(
-    by_vars = exprs(STUDYID, USUBJID, VISIT, VISITNUM, ADT, ADY, VSTPT, VSTPTNUM),
+    by_vars = exprs(STUDYID, USUBJID, !!!adsl_vars, VISIT, VISITNUM, ADT, ADY, VSTPT, VSTPTNUM, AVISIT, AVISITN),
     parameters = "WEIGHT",
     set_values_to = exprs(
       AVAL = AVAL.WEIGHT / (AVAL.HEIGHT / 100)^2,
@@ -166,7 +190,7 @@ advs <- advs %>%
 # BSA = sqrt(身高(cm) × 体重(kg) / 3600)，单位 m²
 advs <- advs %>%
   derive_param_bsa(
-    by_vars = exprs(STUDYID, USUBJID, !!!adsl_vars, VISIT, VISITNUM, ADT, ADY, VSTPT, VSTPTNUM),
+    by_vars = exprs(STUDYID, USUBJID, !!!adsl_vars, VISIT, VISITNUM, ADT, ADY, VSTPT, VSTPTNUM, AVISIT, AVISITN),
     method = "Mosteller",
     set_values_to = exprs(
       PARAMCD = "BSA",
@@ -178,25 +202,6 @@ advs <- advs %>%
     # Below arguments are default values and not necessary to add in our case
     height_code = "HEIGHT",
     weight_code = "WEIGHT"
-  )
-
-## ----r eval=TRUE--------------------------------------------------------------
-# 创建分析访视变量 AVISIT/AVISITN 和时间点变量 ATPT/ATPTN
-# 筛查/非计划/随访访视不计入主要分析（设为 NA），只保留正式访视
-advs <- advs %>%
-  mutate(
-    ATPTN = VSTPTNUM,
-    ATPT = VSTPT,
-    AVISIT = case_when(
-      str_detect(VISIT, "SCREEN|UNSCHED|RETRIEVAL|AMBUL") ~ NA_character_,
-      !is.na(VISIT) ~ str_to_title(VISIT),
-      TRUE ~ NA_character_
-    ),
-    AVISITN = as.numeric(case_when(
-      VISIT == "BASELINE" ~ "0",
-      str_detect(VISIT, "WEEK") ~ str_trim(str_replace(VISIT, "WEEK", "")),
-      TRUE ~ NA_character_
-    ))
   )
 
 ## ----r eval=TRUE--------------------------------------------------------------
@@ -223,6 +228,39 @@ advs <- derive_var_ontrtfl(
   ref_end_date = TRTEDT,
   filter_pre_timepoint = toupper(AVISIT) == "BASELINE" # Observations as not on-treatment
 )
+
+## ----r eval=TRUE--------------------------------------------------------------
+# 派生 End of Treatment（治疗结束）访视行 DTYPE="LOV"（Last Observation Value）
+# 按方案治疗结束访视为 Week 12（AVISITN=12），EOT 窗口为 Week 6-12（AVISITN 6-12）；
+# 窗口内最后一次已参加访视作为该受试者的 EOT 访视（提前结束者在 Week 6/8 取末次，
+# 未达到 Week 6 的受试者不做 LOV）。把 EOT 访视各参数（血压按体位时间点 ATPTN）
+# 的最后一次测量复制为 AVISIT="End of Treatment"（AVISITN=99）、DTYPE="LOV"，
+# 供"末次值"类分析使用（如末次血压、末次体重；身高治疗期内无测量故无 LOV 行）。
+# 注：AVERAGE 汇总行（DTYPE="AVERAGE"）不参与 LOV 选择（is.na(DTYPE) 排除）
+# 实现方式：先把选中的行打标（TEMP_LOVFL），再复制出一份并改标记——
+# 原测量行保留不动，复制行成为 End of Treatment 行
+advs_flagged <- advs %>%
+  restrict_derivation(
+    derivation = derive_var_extreme_flag,
+    args = params(
+      new_var = TEMP_LOVFL,
+      by_vars = exprs(STUDYID, USUBJID, PARAMCD, ATPTN),
+      order = exprs(AVISITN, ADT),
+      mode = "last" # 每个受试者/参数/时间点取 EOT 窗口内最后一次测量
+    ),
+    filter = ONTRTFL == "Y" & !is.na(AVISITN) & AVISITN >= 6 & AVISITN <= 12 & is.na(DTYPE) & !is.na(AVAL)
+  )
+
+lov_rows <- advs_flagged %>%
+  filter(TEMP_LOVFL == "Y") %>%
+  mutate(
+    AVISIT = "End of Treatment",
+    AVISITN = 99,
+    DTYPE = "LOV"
+  ) %>%
+  select(-TEMP_LOVFL)
+
+advs <- bind_rows(advs_flagged %>% select(-TEMP_LOVFL), lov_rows)
 
 ## ----r include=FALSE----------------------------------------------------------
 # 正常值范围参照表：定义各参数的正常范围（ANRLO-ANRHI）和临床参考范围（A1LO-A1HI）

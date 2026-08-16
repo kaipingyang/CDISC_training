@@ -115,9 +115,9 @@ ae <- ae %>%
 **预期产物**：符合 SDTM 规范的 AE 数据集，含 STUDYID/USUBJID/AESEQ/AETERM/
 AESEV/AEOUT 等标准变量，导出为 `ae.xpt`。
 
-## 练习：DM 域和 VS 域
+## 跟做：DM 域和 VS 域
 
-DM/VS 的用法与 AE 完全一样。试着：
+DM/VS 的用法与 AE 完全一样。自学跟做直接跑参考脚本：
 
 ```r
 source("sdtm/dm.R")   # DM 域（人口学）
@@ -125,6 +125,7 @@ source("sdtm/vs.R")   # VS 域（生命体征，含单位换算）
 ```
 
 或在 Claude Code 里说"生成 DM 域 SDTM 映射"，对照生成的代码理解每一步。
+想动手填空练手：用 `users/setup.R <名字>` 建练习区，练习模式只给提示、不直接给答案。
 
 ---
 

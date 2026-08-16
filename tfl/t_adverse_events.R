@@ -17,6 +17,7 @@
 #
 # 输出文件：
 #   - t_adverse_events.txt（表格文本，写入 tempdir()）
+#   - t_adverse_events.docx（Word 报告，写入 tfl/output/，rtables.officer 已安装时）
 #
 # 关键概念说明（给不熟悉 R 的临床数据人员）：
 #   ★ alt_counts_df（分母数据集）★ —— 这是 AE 表最容易困惑的地方：

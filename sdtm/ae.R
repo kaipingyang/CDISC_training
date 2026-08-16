@@ -17,7 +17,7 @@
 #   - metadata/sdtm_ct.csv     : CDISC 受控术语对照表
 #
 # 输出文件：
-#   - ae.xpt（SAS 传输文件，写入 tempdir()）
+#   - ae.xpt（SAS 传输文件，写入 sdtm/output/）
 #
 # 关键概念说明：
 #   AE 域是临床试验中最重要的安全性数据集之一

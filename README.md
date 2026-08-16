@@ -8,6 +8,12 @@ AI skill，用中文自然语言驱动生成符合 CDISC 规范的 SDTM 和 ADaM
 项目基于 pharmaverse 生态系统（sdtm.oak + admiral），所有参考脚本均使用
 CDISCPILOT01 内置示例数据。
 
+> **各层独立运行**：`sdtm/` `adam/` `tfl/` 三层的脚本各自独立运行，输入数据
+> 直接取自 `pharmaverseraw` / `pharmaversesdtm` / `pharmaverseadam` 包内置数据，
+> 并不读取上一层脚本的产物（xpt）。SDTM → ADaM → TFL 是**概念上的数据流**；
+> 各层产物（xpt / docx）供学员查看与对照，不构成自动依赖链。这样设计是为了
+> 每一层脚本都能单独跑通、单独教学。
+
 ---
 
 ## 课程介绍

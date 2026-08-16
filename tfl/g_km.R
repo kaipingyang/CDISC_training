@@ -18,6 +18,7 @@
 #
 # 输出文件：
 #   - g_km_os.png（KM 曲线图，写入 tempdir()）
+#   - g_km.docx（Word 报告，写入 tfl/output/，officer 已安装时）
 #
 # 关键概念说明（给不熟悉 R 的临床数据人员）：
 #   时间到事件（Time-to-Event）：分析"从起点到某事件发生"经历的时间，

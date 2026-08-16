@@ -18,6 +18,7 @@
 #
 # 输出文件：
 #   - g_km_os.png（KM 曲线图，写入 tempdir()）
+#   - g_km.docx（Word 报告，写入 tfl/output/，officer 已安装时）
 #
 # 关键概念说明（给不熟悉 R 的临床数据人员）：
 #   时间到事件（Time-to-Event）：分析"从起点到某事件发生"经历的时间，
@@ -32,8 +33,10 @@
 # =============================================================================
 
 # =============================================================================
-# 【练习版】按 # TODO 提示填空。填不出就问 Claude Code："帮我补全这个 TODO"。
-# 参考答案：tfl/g_km.R（完整版，别改它）—— 先自己填，卡住再看。
+# 【练习版】按 # TODO 提示填空。填不出就问 Claude Code："帮我补全这个 TODO"——
+# 练习模式只会给提示，不会直接读答案，也不会替你写完整版。
+# 写完自查：跟 Claude Code 说"我写完了，帮我对照检查"，它会逐条说明差异。
+# 项目根的 sdtm/ adam/ tfl/ 是完整答案脚本（供对照，勿改），练习时不要读/改它们。
 # =============================================================================
 
 ## ----r setup, message=FALSE, warning=FALSE-----------------------------------
@@ -69,8 +72,9 @@ km_plot <- g_km(
   #   is_event = 是否发生事件    → "is_event"（前面 mutate 派生的逻辑变量）
   #   arm      = 分组变量（治疗组）→ "ARM"
   # 👉 在这里补 variables = list(tte = "...", is_event = "...", arm = "...")，末尾加逗号
-  # 在曲线上标注每组的中位生存时间
-  annot_surv_med = TRUE,
+  # TODO 3: 在曲线上标注每组的中位生存时间（中位数数字 + 线段）
+  #   g_km 的 annot_surv_med = TRUE 会在曲线上标出每组的中位生存时间
+  # 👉 在这里补 annot_surv_med = TRUE，末尾加逗号
   title = "Kaplan-Meier Plot of Overall Survival",
   xlab = "Time (Days)",
   ylab = "Survival Probability"

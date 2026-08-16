@@ -17,7 +17,7 @@
 #   - metadata/sdtm_ct.csv     : CDISC 受控术语对照表
 #
 # 输出文件：
-#   - ae.xpt（SAS 传输文件，写入 tempdir()）
+#   - ae.xpt（SAS 传输文件，写入 sdtm/output/）
 #
 # 关键概念说明：
 #   AE 域是临床试验中最重要的安全性数据集之一
@@ -27,8 +27,10 @@
 # =============================================================================
 
 # =============================================================================
-# 【练习版】按下面的 # TODO 提示填空。填不出就问 Claude Code："帮我补全这个 TODO"。
-# 参考答案：sdtm/ae.R（完整版，别改它）—— 先自己填，卡住再看。
+# 【练习版】按 # TODO 提示填空。填不出就问 Claude Code："帮我补全这个 TODO"——
+# 练习模式只会给提示，不会直接读答案，也不会替你写完整版。
+# 写完自查：跟 Claude Code 说"我写完了，帮我对照检查"，它会逐条说明差异。
+# 项目根的 sdtm/ adam/ tfl/ 是完整答案脚本（供对照，勿改），练习时不要读/改它们。
 # =============================================================================
 
 ## ----r setup, message=FALSE, warning=FALSE, results='hold'--------------------
@@ -78,14 +80,24 @@ ae <- ae %>%
   #   用 assign_ct，受控术语 codelist "C66768"，id_vars = oak_id_vars()
   # 👉 在这里补一段 assign_ct(...)，参考下面 AEREL / AESCAN 的 assign_ct 写法
   identity() %>%   # 占位：填好上面 TODO 后删掉这行 identity()
-  # TODO 2: 映射 AESEV（严重程度），原始变量 IT.AESEV → 目标 AESEV
-  #   用 assign_ct，受控术语 codelist "C66769"，id_vars = oak_id_vars()
-  # 👉 在这里补一段 assign_ct(...)，参考下面 AEREL / AESCAN 的 assign_ct 写法
-  identity() %>%   # 占位：填好上面 TODO 后删掉这行 identity()
-  # TODO 3: 映射 AESER（严重性/是否严重），原始变量 IT.AESER → 目标 AESER
-  #   用 assign_ct，受控术语 codelist "C66742"，id_vars = oak_id_vars()
-  # 👉 在这里补一段 assign_ct(...)，参考下面 AEREL / AESCAN 的 assign_ct 写法
-  identity() %>%   # 占位：填好上面 TODO 后删掉这行 identity()
+  # Map AESEV using assign_ct, raw_var=IT.AESEV, tgt_var=AESEV
+  assign_ct(
+    raw_dat = ae_raw,
+    raw_var = "IT.AESEV",
+    tgt_var = "AESEV",
+    ct_spec = study_ct,
+    ct_clst = "C66769",
+    id_vars = oak_id_vars()
+  ) %>%
+  # Map AESER using assign_ct, raw_var=IT.AESER, tgt_var=AESER
+  assign_ct(
+    raw_dat = ae_raw,
+    raw_var = "IT.AESER",
+    tgt_var = "AESER",
+    ct_spec = study_ct,
+    ct_clst = "C66742",
+    id_vars = oak_id_vars()
+  ) %>%
   # Map AEACN using assign_no_ct, raw_var=IT.AEACN, tgt_var=AEACN
   assign_no_ct(
     raw_dat = ae_raw,
@@ -166,14 +178,12 @@ ae <- ae %>%
     ct_clst = "C66742",
     id_vars = oak_id_vars()
   ) %>%
-  # Map AEDTC using assign_datetime, raw_var=AEDTCOL
-  # assign_datetime 将原始日期字符串解析并转换为 ISO 8601 格式（YYYY-MM-DD）
-  assign_datetime(
-    raw_dat = ae_raw,
-    raw_var = "AEDTCOL",
-    tgt_var = "AEDTC",
-    raw_fmt = c("m/d/y")
-  ) %>%
+  # TODO 2: 映射 AEDTC（不良事件记录日期），原始变量 AEDTCOL → 目标 AEDTC
+  #   用 assign_datetime 将原始日期字符串解析并转换为 ISO 8601 格式（YYYY-MM-DD）：
+  #     - raw_dat = ae_raw，raw_var = "AEDTCOL"，tgt_var = "AEDTC"
+  #     - raw_fmt = c("m/d/y")（原始日期格式：月/日/年）
+  #   👉 在这里补一段 assign_datetime(...)，参考下面 AESTDTC / AEENDTC 的写法
+  identity() %>%   # 占位：填好上面 TODO 后删掉这行 identity()
   # Map AESTDTC using assign_datetime, raw_var=IT.AESTDAT
   assign_datetime(
     raw_dat = ae_raw,
@@ -219,13 +229,12 @@ ae <- ae %>%
     tgt_var = "AESEQ",
     rec_vars = c("USUBJID", "AETERM")
   ) %>%
-  derive_study_day(
-    sdtm_in = .,
-    dm_domain = dm,
-    tgdt = "AESTDTC",
-    refdt = "RFXSTDTC",
-    study_day_var = "AESTDY"
-  ) %>%
+  # TODO 3: 派生 AE 开始研究日 AESTDY（相对于首次用药日 RFXSTDTC）
+  #   derive_study_day 计算相对研究日（用药日为第1天，用药前为负数）：
+  #     - sdtm_in = .，dm_domain = dm（DM 域提供参照日期）
+  #     - tgdt = "AESTDTC"，refdt = "RFXSTDTC"，study_day_var = "AESTDY"
+  #   👉 参考下面 AEENDY 的 derive_study_day 写法补上
+  identity() %>%   # 占位：填好上面 TODO 后删掉这行 identity()
   derive_study_day(
     sdtm_in = .,
     dm_domain = dm,
@@ -242,6 +251,7 @@ ae <- ae %>%
 
 ## ----r export--------------------------------------------------------------
 # 导出为 SAS 传输文件（.xpt），供下游 ADaM 或电子提交使用
-dir <- tempdir()
+dir <- "sdtm/output"
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 ae %>%
   xportr_write(file.path(dir, "ae.xpt"), domain = "AE")

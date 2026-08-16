@@ -18,7 +18,13 @@
 #   - metadata/sdtm_ct.csv     : CDISC 受控术语对照表
 #
 # 输出文件：
-#   - vs.xpt（SAS 传输文件，写入 tempdir()）
+#   - vs.xpt（SAS 传输文件，写入 sdtm/output/）
+#
+# 与官方 pharmaversesdtm::vs 的差异说明：官方数据含 8 条"站立1分钟
+# （AFTER STANDING FOR 1 MINUTE）"体位点的未测量记录（VSSTAT="NOT DONE"、
+# VSORRES 缺失），位于 3 位受试者的 3 次访视。因原始 EDC 数据（vs_raw）
+# 不含"未测"标记、无法重建这些计划记录，本脚本输出 29,635 行而官方为
+# 29,643 行（差异 0.03%）；其余记录逐参数完全一致。
 #
 # 关键概念说明：
 #   VS 域采用"竖式"（tall/narrow）数据结构：每行一个测量指标，而非横式（每行一次访视）
@@ -29,8 +35,10 @@
 # =============================================================================
 
 # =============================================================================
-# 【练习版】按下面的 # TODO 提示填空。填不出就问 Claude Code："帮我补全这个 TODO"。
-# 参考答案：sdtm/vs.R（完整版，别改它）—— 先自己填，卡住再看。
+# 【练习版】按 # TODO 提示填空。填不出就问 Claude Code："帮我补全这个 TODO"——
+# 练习模式只会给提示，不会直接读答案，也不会替你写完整版。
+# 写完自查：跟 Claude Code 说"我写完了，帮我对照检查"，它会逐条说明差异。
+# 项目根的 sdtm/ adam/ tfl/ 是完整答案脚本（供对照，勿改），练习时不要读/改它们。
 # 提示：本练习只挖了"收缩压 SYSBP"这一组的 3 处，下面舒张压/脉搏/体温/身高/体重
 #       五组是完整示范，照着它们的写法填收缩压即可。
 # =============================================================================
@@ -90,11 +98,16 @@ vs_sysbp <- vs_sysbp %>%
   #   用 assign_no_ct（原始测量值原样复制，无需受控术语转换），id_vars = oak_id_vars()
   # 👉 在这里补一段 assign_no_ct(...)，参考下面舒张压 vs_diabp 里 VSORRES 的 assign_no_ct 写法
   identity() %>%   # 占位：填好上面 TODO 后删掉这行 identity()
-  # TODO 3: 映射 VSORRESU（原始结果单位），用 hardcode_ct 赋固定值 "mmHg"
-  #   raw_var = "SYS_BP"，tgt_var = "VSORRESU"，tgt_val = "mmHg"，
-  #   ct_spec = study_ct，ct_clst = "C66770"，id_vars = oak_id_vars()
-  # 👉 在这里补一段 hardcode_ct(...)，参考下面舒张压 vs_diabp 里 VSORRESU 的 hardcode_ct 写法
-  identity() %>%   # 占位：填好上面 TODO 后删掉这行 identity()
+  # Map VSORRESU using hardcode_ct algorithm
+  hardcode_ct(
+    raw_dat = vs_raw,
+    raw_var = "SYS_BP",
+    tgt_var = "VSORRESU",
+    tgt_val = "mmHg",
+    ct_spec = study_ct,
+    ct_clst = "C66770",
+    id_vars = oak_id_vars()
+  ) %>%
   # Map VSPOS using assign_ct algorithm
   assign_ct(
     raw_dat = vs_raw,
@@ -383,13 +396,12 @@ vs_combined <- dplyr::bind_rows(
 # Map qualifiers common to all topic variables
 # 映射所有指标共用的限定变量：采集时间、时间点、访视信息
 vs <- vs_combined %>%
-  # Map VSDTC using assign_ct algorithm
-  assign_datetime(
-    raw_dat = vs_raw,
-    raw_var = c("VTLD"),
-    tgt_var = "VSDTC",
-    raw_fmt = c(list(c("d-m-y", "dd-mmm-yyyy")))
-  ) %>%
+  # TODO 3: 映射 VSDTC（生命体征采集日期），原始变量 VTLD → 目标 VSDTC
+  #   用 assign_datetime 把原始日期字符串解析为 ISO 8601 格式（YYYY-MM-DD）：
+  #     - raw_dat = vs_raw，raw_var = "VTLD"，tgt_var = "VSDTC"
+  #     - raw_fmt = c(list(c("d-m-y", "dd-mmm-yyyy")))（原始日期可能有两种格式）
+  #   👉 在这里补一段 assign_datetime(...)
+  identity() %>%   # 占位：填好上面 TODO 后删掉这行 identity()
   # Map VSTPT from TMPTC using assign_ct
   assign_ct(
     raw_dat = vs_raw,
@@ -461,6 +473,7 @@ vs <- vs %>%
 
 ## ----r export--------------------------------------------------------------
 # 导出为 SAS 传输文件（.xpt），供下游 ADaM 或电子提交使用
-dir <- tempdir()
+dir <- "sdtm/output"
+dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 vs %>%
   xportr_write(file.path(dir, "vs.xpt"), domain = "VS")

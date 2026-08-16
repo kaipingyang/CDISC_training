@@ -29,6 +29,23 @@ Agent Skills，用中文自然语言驱动生成 SDTM / ADaM / TFL 数据集与�
 - `sdtm/output/` `adam/output/` `tfl/output/` — 各层生成产物（xpt / docx，已 gitignore）
 - `metadata/` — 规格书（onco_spec.xlsx、safety_specs.xlsx、sdtm_ct.csv）
 - 脚本产出：SDTM/ADaM 输出 xpt；TFL 输出三线表 Word 报告（横版、Times New Roman、标题/人群居中、脚注在表格下方）
+- **各层独立运行**：`sdtm/` `adam/` `tfl/` 脚本各自独立可跑，输入数据直接取自
+  pharmaverseraw / pharmaversesdtm / pharmaverseadam 包内置数据，不读上一层产物；
+  SDTM → ADaM → TFL 是概念数据流，产物（xpt/docx）仅供查看对照，无自动依赖
+
+## 答案访问规则（学员会话）
+
+根目录的 `sdtm/` `adam/` `tfl/` 是完整答案脚本（供对照，勿改）；
+`users/<学员名>/` 下同名目录是学员自己的练习文件，**不属于答案**，学员求助时可正常读取。
+
+- **练习模式（默认）**：学员请求生成代码、补全 TODO、评估正确性
+  （如"帮我看看这段对不对"）时，严禁读取根目录 `sdtm/` `adam/` `tfl/`
+  下的答案脚本及其 output/ 产物；只能依据 metadata/ 规格书与 CDISC
+  标准，通过提示引导学员自己完成。
+- **检查模式**：仅当学员明确表达"检查/对照/对比答案"（如"帮我对照一下
+  答案""我写完了，检查一下"）时，才允许读取答案进行比对，并逐条说明
+  差异，而不是直接代写。
+- 触发检查模式前，先确认学员的练习已告一段落。
 
 ## 环境注意
 

@@ -18,7 +18,13 @@
 #   - metadata/sdtm_ct.csv     : CDISC 受控术语对照表
 #
 # 输出文件：
-#   - vs.xpt（SAS 传输文件，写入 tempdir()）
+#   - vs.xpt（SAS 传输文件，写入 sdtm/output/）
+#
+# 与官方 pharmaversesdtm::vs 的差异说明：官方数据含 8 条"站立1分钟
+# （AFTER STANDING FOR 1 MINUTE）"体位点的未测量记录（VSSTAT="NOT DONE"、
+# VSORRES 缺失），位于 3 位受试者的 3 次访视。因原始 EDC 数据（vs_raw）
+# 不含"未测"标记、无法重建这些计划记录，本脚本输出 29,635 行而官方为
+# 29,643 行（差异 0.03%）；其余记录逐参数完全一致。
 #
 # 关键概念说明：
 #   VS 域采用"竖式"（tall/narrow）数据结构：每行一个测量指标，而非横式（每行一次访视）

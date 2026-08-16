@@ -24,7 +24,7 @@
 #   - metadata/safety_specs.xlsx : ADaM 规格书（定义变量、受控术语、排序等）
 #
 # 输出文件：
-#   - adsl.xpt（SAS 传输文件，写入 tempdir()）
+#   - adsl.xpt（SAS 传输文件，写入 adam/output/）
 #
 # 关键概念说明：
 #   ADSL 是所有 ADaM 分析的起点，包含以下关键变量类别：

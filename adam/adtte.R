@@ -19,7 +19,7 @@
 #   - metadata/onco_spec.xlsx     : ADTTE 规格书
 #
 # 输出文件：
-#   - adtte.xpt（SAS 传输文件，写入 tempdir()）
+#   - adtte.xpt（SAS 传输文件，写入 adam/output/）
 #
 # 关键概念说明：
 #   生存分析核心概念：
@@ -51,9 +51,6 @@ metacore <- spec_to_metacore("./metadata/onco_spec.xlsx") %>%
 # Load source datasets
 adsl <- pharmaverseadam::adsl
 adrs <- pharmaverseadam::adrs_onco
-
-# 将 adrs_onco 赋值给 adrs（简化后续引用）
-adrs <- adrs_onco
 
 ## ----r------------------------------------------------------------------------
 # 定义事件来源和删失来源
