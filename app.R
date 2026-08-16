@@ -8,7 +8,7 @@
 # 数据源：
 #   pharmaverseadam::adsl / adae / adtte_onco（与 tfl/ 脚本同源，开箱即用）
 # 运行：
-#   Rscript app/app.R   （或 R 会话内 source("app/app.R")）
+#   Rscript app.R   （或 R 会话内 source("app.R")）
 # 依赖：teal、teal.modules.clinical、teal.modules.general
 # =============================================================================
 # 已知坑（详见 .claude/skills/teal-clinical-modules/references/gotchas.md）：
@@ -101,6 +101,26 @@ modules <- modules(
     header_text = c(
       "CDISC 数据集生成训练",
       "SDTM → ADaM → TFL 全流程产出交互浏览"
+    ),
+    # 首页内容：项目简介 + 模块导航 + 数据来源（additional_tags 自由 HTML）
+    additional_tags = htmltools::tagList(
+      htmltools::HTML(paste0(
+        "<div style='padding: 10px 20px 30px 20px; line-height: 1.7;'>",
+        "<h4>项目简介</h4>",
+        "<p>面向临床数据人员的 CDISC 标准数据集训练平台 —— ",
+        "基于 pharmaverse 生态（sdtm.oak / admiral / tern），",
+        "通过 Claude Code + skill 用中文自然语言驱动生成数据集与报告。</p>",
+        "<h4>模块导航</h4>",
+        "<ul>",
+        "<li><b>SDTM 数据</b> —— DM / AE / VS 三个域的映射结果浏览</li>",
+        "<li><b>ADaM 数据</b> —— ADSL / ADAE / ADTTE 分析数据集浏览</li>",
+        "<li><b>TFL</b> —— 人口学特征表 / 不良事件汇总表 / KM 生存曲线</li>",
+        "</ul>",
+        "<h4>数据来源</h4>",
+        "<p>pharmaverseraw / pharmaversesdtm / pharmaverseadam 包内置的 ",
+        "CDISCPILOT01 示例研究数据（与 sdtm/、adam/、tfl/ 脚本同源）</p>",
+        "</div>"
+      ))
     )
   ),
   # SDTM：一个模块看三个域（对应 sdtm/ 脚本产物）
@@ -150,5 +170,11 @@ app <- init(
 )
 
 # 标准 Shiny app.R 约定（Posit Connect 部署直接识别本对象）
-# 本地运行：R 会话里 runApp("app")（或 shiny::runApp(app)）
+# 本地运行：R 会话里 runApp()（或 Rscript run_app.R）
 shiny::shinyApp(ui = app$ui, server = app$server)
+
+# ── PharmaROSE 平台外部访问地址 ─────────────────────────────────────────
+# 启动后，浏览器打开（需已登录平台）：
+#   https://c3c-training.mediwei.com/u/c3c-training-kaiping-cdisc-training/proxy/<端口>/
+# <端口> 为实际启动端口：run_app.R 会自动选择并打印完整地址；
+# 手动 runApp() 时看控制台 "Listening on http://0.0.0.0:<端口>"。
