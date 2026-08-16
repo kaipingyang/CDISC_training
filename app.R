@@ -174,7 +174,8 @@ app <- init(
 shiny::shinyApp(ui = app$ui, server = app$server)
 
 # ── PharmaROSE 平台外部访问地址 ─────────────────────────────────────────
-# 启动后，浏览器打开（需已登录平台）：
+# 启动后，浏览器打开（需已登录平台）—— ⚠️ 末尾必须带斜杠（否则 JS/CSS
+# 资源解析错位，页面变纯文本）：
 #   https://c3c-training.mediwei.com/u/c3c-training-kaiping-cdisc-training/proxy/<端口>/
-# <端口> 为实际启动端口：run_app.R 会自动选择并打印完整地址；
+# <端口> 为实际启动端口：run_app.R 会自动选择并打印完整地址（已带斜杠）；
 # 手动 runApp() 时看控制台 "Listening on http://0.0.0.0:<端口>"。
