@@ -391,6 +391,35 @@ SDTM 映射完成后，提示用户：
 
 ---
 
+## 常见坑（实战踩坑记录）
+
+### 坑 1：`assign_*` 不能直接管道完整原始数据
+
+- **报错**：`as.vector(NA, mode = typeof(tgt_val)) : invalid 'mode' argument`
+- **原因**：tgt_dat（管道里的数据）与 raw_dat 含同名列时，sdtm_join 会把重复列变成
+  `xxx.x` / `xxx.y` 后缀，`join_dat[[raw_var]]` 取不到值 → ct_map 返回 NULL。
+- **解法**：管道起点先建骨架再开始映射：
+
+  ```r
+  ex <- ec_raw %>%
+    select(oak_id, raw_source, patient_number) %>%   # 骨架：只保留 OAK 追踪列
+    assign_no_ct(raw_dat = ec_raw, raw_var = "DRUGAD", tgt_var = "EXTRT", ...)
+  ```
+
+  参考：`users/zhangsan/sdtm/ex.R`。管道里要用原始列时，从外层对象取
+  （`ec_raw[["IT.ECDSTXT"]]`），不要指望 tgt_dat 里还有原始列。
+
+### 坑 2：hardcode_ct / assign_ct 的 codelist 必须先查 CT 表
+
+- **报错**：同上（ct_map 无匹配返回 NULL 触发）。
+- **原因**：把 codelist 挂到不存在的值上，如 DSCAT="DISPOSITION EVENT" 挂了
+  C99073——其实 C99073 是 LEFT/RIGHT（偏侧性）。
+- **解法**：写映射前先看 `metadata/sdtm_ct.csv` 有哪些 codelist 和值
+  （`awk -F',' '$1=="\"C66729\""' metadata/sdtm_ct.csv` 查单个 codelist）；
+  没有对应条目的值用 `assign_no_ct` 原样复制或 `mutate` 写常量，别硬挂。
+
+---
+
 ## 常见问题解答
 
 ### Q1：运行代码时提示"找不到某个变量"怎么办？

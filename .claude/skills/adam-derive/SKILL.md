@@ -232,6 +232,72 @@ adsl |> summarise(
 
 ---
 
+## 常见坑（实战踩坑记录）
+
+### 坑 1：SDTM 基线标志可能每人每参数多条
+
+- **报错**：`signal_duplicate_records(): Input dataset contains multiple baseline records with respect to STUDYID, USUBJID, PARAMCD`（derive_var_base 内部断言）。
+- **原因**：SDTM 的 EGBLFL/LBBLFL=="Y" 在同一受试者/参数下可能有多条记录
+  （如多次测量都标了基线）。
+- **解法**：先取末条打唯一基线标志，再派生 BASE：
+
+  ```r
+  df <- df %>%
+    mutate(ABLFL = ifelse(LBBLFL == "Y", "Y", NA_character_)) %>%
+    restrict_derivation(
+      derivation = derive_var_extreme_flag,
+      args = params(
+        by_vars = exprs(STUDYID, USUBJID, PARAMCD),
+        order = exprs(ADT, VISITNUM, LBSEQ),
+        new_var = TEMP_ABLFL,
+        mode = "last"
+      ),
+      filter = ABLFL == "Y" & !is.na(AVAL)
+    ) %>%
+    mutate(ABLFL = ifelse(TEMP_ABLFL == "Y", "Y", NA_character_)) %>%
+    select(-TEMP_ABLFL) %>%
+    derive_var_base(by_vars = exprs(STUDYID, USUBJID, PARAMCD),
+                    source_var = AVAL, new_var = BASE, filter = ABLFL == "Y")
+  ```
+
+  参考：`users/zhangsan/adam/adlb.R`、`users/zhangsan/adam/adeg.R`。
+
+### 坑 2：BDS 序号 order 必须保证组内唯一
+
+- **报错**：`signal_duplicate_records()`（derive_var_obs_number 的
+  `check_type = "error"` 断言）。
+- **原因**：同一受试者/参数/访视可能有多条记录（如 EG 一次访视多个时间点），
+  `order = exprs(PARAMCD, ADT, VISITNUM)` 无法区分它们。
+- **解法**：order 里加上 SDTM 序号列兜底：
+  `order = exprs(PARAMCD, ADT, VISITNUM, EGSEQ)`（实验室用 LBSEQ）。
+
+### 坑 3：第一个 `derive_param_tte` 不带 dataset 管道输入
+
+- **报错**：`assert_param_does_not_exist(): Required variable PARAMCD is missing in dataset`。
+- **原因**：`derive_param_tte` 的输入数据集要求已有 PARAMCD 列（用于检查新终点
+  不重复）——从零创建第一个终点（如 OS）时，照 SDTM 习惯写
+  `adsl %>% derive_param_tte(...)` 就会踩中。
+- **解法**：第一个终点直接调用、不接管道（dataset=NULL 时跳过该检查），
+  后续终点再 `%>%` 接在上一步结果上：
+
+  ```r
+  adtte <- derive_param_tte(          # 第一个：不带管道输入
+    dataset_adsl = adsl,
+    start_date = RANDDT,
+    event_conditions = list(death_event),
+    censor_conditions = list(lastalive_censor, rand_censor),
+    source_datasets = list(adsl = adsl, adrs = adrs),
+    set_values_to = exprs(PARAMCD = "OS", PARAM = "Overall Survival")
+  ) %>%
+    derive_param_tte(                 # 后续终点：%>% 接续
+      ...
+    )
+  ```
+
+  参考：`users/zhangsan/adam/adtte.R`、admiralonco 官方模板 `ad_adtte.R`。
+
+---
+
 ## 常见问题解答
 
 **Q：没有 SDTM 数据怎么练习？**
