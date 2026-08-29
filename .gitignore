@@ -6,7 +6,6 @@ renv/local/
 renv/staging/
 renv/python/
 renv/sandbox/
-.Rprofile
 
 # R artifacts
 .Rhistory
