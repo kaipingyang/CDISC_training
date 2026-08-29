@@ -20,7 +20,7 @@
 #   - metadata/safety_specs.xlsx : ADaM 规格书
 #
 # 输出文件：
-#   - advs.xpt（SAS 传输文件，写入 adam/output/）
+#   - advs.xpt（SAS 传输文件，写入 users/<STUDENT_NAME>/adam/output/）
 #
 # 关键概念说明：
 #   PARAMCD/PARAM：ADaM 的参数化标识，将 VSTESTCD（如"SYSBP"）映射为分析参数
@@ -462,7 +462,7 @@ advs <- advs %>%
   )
 
 ## ----r, message=FALSE, warning=FALSE------------------------------------------
-dir <- "adam/output" # Specify the directory for saving the XPT file
+dir <- "users/<STUDENT_NAME>/adam/output" # Specify the directory for saving the XPT file
 dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 # Apply metadata and perform checks

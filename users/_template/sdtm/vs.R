@@ -18,7 +18,7 @@
 #   - metadata/sdtm_ct.csv     : CDISC 受控术语对照表
 #
 # 输出文件：
-#   - vs.xpt（SAS 传输文件，写入 sdtm/output/）
+#   - vs.xpt（SAS 传输文件，写入 users/<STUDENT_NAME>/sdtm/output/）
 #
 # 与官方 pharmaversesdtm::vs 的差异说明：官方数据含 8 条"站立1分钟
 # （AFTER STANDING FOR 1 MINUTE）"体位点的未测量记录（VSSTAT="NOT DONE"、
@@ -473,7 +473,7 @@ vs <- vs %>%
 
 ## ----r export--------------------------------------------------------------
 # 导出为 SAS 传输文件（.xpt），供下游 ADaM 或电子提交使用
-dir <- "sdtm/output"
+dir <- "users/<STUDENT_NAME>/sdtm/output"
 dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 vs %>%
   xportr_write(file.path(dir, "vs.xpt"), domain = "VS")

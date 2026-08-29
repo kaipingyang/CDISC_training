@@ -171,4 +171,40 @@ build_table(
 
 ---
 
+## 四、Word 报告导出（docx）
+
+`build_table()` 得到的表格对象可用 `export_as_txt()` 导出纯文本（临时查看），
+正式报告产物是 **.docx**。**注意：新版 rtables（0.6.x）已移除 `export_as_docx()`**，
+标准导出路径是 `rtables.officer::tt_to_flextable()` + flextable/officer 手动构建：
+
+```r
+# rtables 表格 → flextable → Word 文档（横版 + Times New Roman）
+ft <- rtables.officer::tt_to_flextable(tbl, theme = rtables.officer::theme_docx_default())
+ft <- flextable::font(ft, fontname = "Times New Roman", part = "all")
+ft <- flextable::fontsize(ft, size = 11, part = "all")   # 默认 9pt 偏小，报告规范 11pt
+doc <- officer::read_docx() %>%
+  flextable::body_add_flextable(ft, align = "center") %>%
+  officer::body_end_section_landscape()                   # 横版（景观）页面
+print(doc, target = "t_demographic.docx")                 # 保存
+```
+
+页眉页脚（标题/人群/Source 注释）在 `build_table()` 之后用属性赋值附加：
+
+```r
+main_title(tbl)   <- "Table 14.1.1 Demographic Characteristics"
+subtitles(tbl)    <- "Population: Safety Analysis Set"
+main_footer(tbl)  <- "Source: ADSL. ..."   # 注意：是 subtitles<-，不是 main_subtitle<-
+```
+
+**已踩过的坑（勿重复试错）**：
+
+1. `export_as_docx()` 在 rtables 0.6.x **不存在**——用 `tt_to_flextable()` 路线。
+2. `body_add_flextable()` 属于 **flextable** 包（officer 的扩展方法），不是 officer 的导出对象；
+   报 `is not an exported object` 时先 `ls("package:xxx")` 查真实函数名。
+3. rdocx 对象保存用 `print(doc, target = ...)`（S3 方法），`officer::print` 不存在。
+4. `theme_docx_default()` 默认 **9pt 且行距紧凑**，正式报告建议 11pt + 段后距 5pt
+   （数据左对齐是临床表格惯例）——这是与官方答案产物对比后确认的排版规范。
+
+---
+
 更多即用表格代码见官方 **TLG Catalog**，导航见 [catalog.md](catalog.md)。图形速查见 [figures.md](figures.md)。

@@ -83,6 +83,9 @@ print(tbl)
 export_as_txt(tbl, file = file.path(tempdir(), "t_demographic.txt"))
 ```
 
+> ③ 的正式产物是 **.docx**（横版 + Times New Roman + 11pt）：标准导出流程、
+> 页眉页脚设置与已踩坑清单见 `references/tables.md` 的"四、Word 报告导出（docx）"。
+
 ---
 
 #### 模板 B：AE 汇总表（中级，双数据集分母）

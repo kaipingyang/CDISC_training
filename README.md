@@ -106,6 +106,27 @@ renv 会读取 `renv.lock` 中记录的精确版本，确保环境完全一致�
 
 ---
 
+## 进阶脚本与官方数据的已知差异记录
+
+本项目的参考脚本产物以 pharmaverse 官方包数据（pharmaversesdtm / pharmaverseadam）为对照基准，
+以下几个差异是**有意设计或数据源差异**，非脚本错误：
+
+- **`metadata/sdtm_ct.csv` 的 VISITNUM 对照表整体错位**（如 WEEK 2 应为 4 而非 5）：
+  `sdtm/ds.R`、`sdtm/ex.R`（以及既有的 `sdtm/vs.R`）不使用该表映射 VISITNUM，
+  而是脚本内置查表（BSL=3、WEEK N=N+2、AMBUL 3.5、RETRIEVAL=201、UNSCHEDULED 小数），
+  与官方口径一致。
+- **DS 的 DSSPID**：原始 EDC（`ds_raw`）未采集赞助商定义的处置标识，`sdtm/ds.R` 恒为缺失；
+  官方数据有 95 行非空（无法从 raw 重建，差异记录留档）。
+- **ADLB 的 CALCULATION 行**：官方 AGDA 另有 24 行 DTYPE="CALCULATION" 的复核值
+  （BASO/LYMPH 由 WBC×占比重算），答案脚本以 SDTM 标准化结果为最终值，不重现该行；
+  因此 BASO/LYMPH 参数的 BASE/CHG 与官方存在 56 行口径差异。
+- **ADCM 的 AENDT**：4 行部分日期（如 "2013-11"）的 imputation 与官方世纪版本存在
+  边界差异（官方值非月初/月末），影响 AENDY/ADURN 4 行。
+- **ADEG 的衍生行**：QTc/RRR 等衍生参数行与官方在 EGSEQ/ATPT 键上的对齐存在少数差异。
+
+> 验收原则：常规行主键对齐后核心派生列（AVAL/ABLFL/BASE/CHG/ANRIND/ONTRTFL/APHASE 等）
+> 与官方一致；上述边缘行差异记录于此，不阻塞练习对照。
+
 ### 第二步：生成 SDTM 数据集
 
 有两种方式可以生成 SDTM 域数据集：
@@ -199,16 +220,25 @@ CDISC_training/
 ├── sdtm/
 │   ├── dm.R                 # DM 域：人口学，SDTM 映射参考脚本
 │   ├── ae.R                 # AE 域：不良事件映射
-│   └── vs.R                 # VS 域：生命体征映射
+│   ├── vs.R                 # VS 域：生命体征映射
+│   ├── ds.R                 # DS 域：受试者处置映射（练习进阶）
+│   └── ex.R                 # EX 域：药物暴露映射（练习进阶）
 ├── adam/
 │   ├── adsl.R               # ADSL：受试者级分析数据集
 │   ├── adae.R               # ADAE：不良事件分析数据集
 │   ├── advs.R               # ADVS：生命体征分析数据集
-│   └── adtte.R              # ADTTE：生存分析数据集
+│   ├── adtte.R              # ADTTE：生存分析数据集
+│   ├── adlb.R               # ADLB：实验室检查分析数据集（BDS）
+│   ├── adeg.R               # ADEG：心电图分析数据集（BDS）
+│   ├── adcm.R               # ADCM：合并用药分析数据集（OCCDS）
+│   └── specs.R              # ADLB/ADEG/ADCM 的规格数据（metacore 构造用）
 ├── tfl/
 │   ├── t_demographic.R      # 人口学特征表（tern/rtables）
 │   ├── t_adverse_events.R   # AE 汇总表（含 alt_counts_df 分母）
-│   └── g_km.R               # KM 生存曲线图（tern g_km）
+│   ├── g_km.R               # KM 生存曲线图（tern g_km）
+│   ├── t_lab.R              # 实验室检查汇总表（进阶）
+│   ├── t_vitals.R           # 生命体征汇总表（进阶）
+│   └── g_km_pfs.R           # PFS KM 生存曲线图（进阶）
 ├── docs/
 │   ├── slides.qmd           # 讲师幻灯片（Quarto revealjs，两课时）
 │   └── tutorial.qmd         # 学员自学手册（Quarto html）

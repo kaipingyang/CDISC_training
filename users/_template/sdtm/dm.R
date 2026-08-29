@@ -18,7 +18,7 @@
 #   - metadata/sdtm_ct.csv    : CDISC 受控术语对照表
 #
 # 输出文件：
-#   - dm.xpt（SAS 传输文件，写入 sdtm/output/）
+#   - dm.xpt（SAS 传输文件，写入 users/<STUDENT_NAME>/sdtm/output/）
 #
 # 关键概念说明（给不熟悉R的临床数据人员）：
 #   SDTM 映射：把 EDC 收集的原始变量名，按 CDISC 规定重命名并转换成标准格式
@@ -294,7 +294,7 @@ dm <- dm %>%
 
 ## ----r export--------------------------------------------------------------
 # 导出为 SAS 传输文件（.xpt），供下游 ADaM 或电子提交使用
-dir <- "sdtm/output"
+dir <- "users/<STUDENT_NAME>/sdtm/output"
 dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 dm %>%
   xportr_write(file.path(dir, "dm.xpt"), domain = "DM")

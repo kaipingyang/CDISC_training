@@ -17,7 +17,7 @@
 #   - metadata/sdtm_ct.csv     : CDISC 受控术语对照表
 #
 # 输出文件：
-#   - ae.xpt（SAS 传输文件，写入 sdtm/output/）
+#   - ae.xpt（SAS 传输文件，写入 users/<STUDENT_NAME>/sdtm/output/）
 #
 # 关键概念说明：
 #   AE 域是临床试验中最重要的安全性数据集之一
@@ -251,7 +251,7 @@ ae <- ae %>%
 
 ## ----r export--------------------------------------------------------------
 # 导出为 SAS 传输文件（.xpt），供下游 ADaM 或电子提交使用
-dir <- "sdtm/output"
+dir <- "users/<STUDENT_NAME>/sdtm/output"
 dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 ae %>%
   xportr_write(file.path(dir, "ae.xpt"), domain = "AE")

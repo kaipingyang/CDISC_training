@@ -20,7 +20,7 @@
 #   - metadata/safety_specs.xlsx : ADaM 规格书
 #
 # 输出文件：
-#   - adae.xpt（SAS 传输文件，写入 adam/output/）
+#   - adae.xpt（SAS 传输文件，写入 users/<STUDENT_NAME>/adam/output/）
 #
 # 关键概念说明：
 #   TRTEMFL：治疗期内发生的不良事件标志（"Treatment-Emergent"），是安全性分析的核心
@@ -219,7 +219,7 @@ adae <- adae %>%
 # check_ct_data    : 验证受控术语值合规
 # order_cols/sort_by_key : 按规格排列列和行
 # xportr_* : 设置 SAS 格式属性并导出 .xpt
-dir <- "adam/output" # Specify the directory for saving the XPT file
+dir <- "users/<STUDENT_NAME>/adam/output" # Specify the directory for saving the XPT file
 dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 adae %>%
