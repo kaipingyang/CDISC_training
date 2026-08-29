@@ -204,9 +204,9 @@ A：表格用 `export_as_txt()`（文本）、`as_html()`（网页）、`export_
 ## 项目本地脚本参考
 
 项目中已有完整可运行的 TFL 脚本，可作为参考：
-- `tfl/t_demographic.R` - 人口学特征表完整示例（入门主线）
-- `tfl/t_adverse_events.R` - AE 汇总表完整示例（含 alt_counts_df 分母）
-- `tfl/g_km.R` - KM 生存曲线图完整示例
+- `tfl/01_t_demographic.R` - 人口学特征表完整示例（入门主线）
+- `tfl/02_t_adverse_events.R` - AE 汇总表完整示例（含 alt_counts_df 分母）
+- `tfl/03_g_km.R` - KM 生存曲线图完整示例
 
 这些脚本已实测可运行（基于 pharmaverseadam 测试数据），如果本地脚本与模板有差异，以本地脚本为准。
 

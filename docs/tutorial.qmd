@@ -83,7 +83,7 @@ sdtm.oak 提供三种映射动作：
 **方式一 —— 直接运行参考脚本**：
 
 ```r
-source("sdtm/ae.R")   # 生成 AE 域，导出 ae.xpt
+source("sdtm/03_ae.R")   # 生成 AE 域，导出 ae.xpt
 ```
 
 **方式二 —— 在 Claude Code 里用自然语言触发 `sdtm-map` skill**：
@@ -120,8 +120,8 @@ AESEV/AEOUT 等标准变量，导出为 `ae.xpt`。
 DM/VS 的用法与 AE 完全一样。自学跟做直接跑参考脚本：
 
 ```r
-source("sdtm/dm.R")   # DM 域（人口学）
-source("sdtm/vs.R")   # VS 域（生命体征，含单位换算）
+source("sdtm/01_dm.R")   # DM 域（人口学）
+source("sdtm/02_vs.R")   # VS 域（生命体征，含单位换算）
 ```
 
 或在 Claude Code 里说"生成 DM 域 SDTM 映射"，对照生成的代码理解每一步。
@@ -151,8 +151,8 @@ admiral 提供 `derive_*` 系列派生函数，一个函数做一件事，串成
 **运行参考脚本**：
 
 ```r
-source("adam/adsl.R")   # ADSL：受试者级数据集（所有 ADaM 的基础）
-source("adam/adae.R")   # ADAE：不良事件分析数据集
+source("adam/01_adsl.R")   # ADSL：受试者级数据集（所有 ADaM 的基础）
+source("adam/02_adae.R")   # ADAE：不良事件分析数据集
 ```
 
 **或在 Claude Code 里触发 `admiral-adsl` / `adam-derive` skill**：
@@ -200,14 +200,14 @@ tbl <- build_table(lyt, df = adsl)
 
 | 你说的话 | 生成脚本 | 输入数据 |
 |---------|---------|---------|
-| "做人口学特征表，按治疗组分列" | `tfl/t_demographic.R` | ADSL |
-| "AE 汇总表，按 SOC 和 PT 统计发生率" | `tfl/t_adverse_events.R` | ADAE + ADSL |
-| "画总生存期 OS 的 KM 生存曲线" | `tfl/g_km.R` | ADTTE |
+| "做人口学特征表，按治疗组分列" | `tfl/01_t_demographic.R` | ADSL |
+| "AE 汇总表，按 SOC 和 PT 统计发生率" | `tfl/02_t_adverse_events.R` | ADAE + ADSL |
+| "画总生存期 OS 的 KM 生存曲线" | `tfl/03_g_km.R` | ADTTE |
 
 ```r
-source("tfl/t_demographic.R")      # 人口学特征表 → 文本
-source("tfl/t_adverse_events.R")   # AE 汇总表 → 文本
-source("tfl/g_km.R")               # KM 生存曲线 → PNG
+source("tfl/01_t_demographic.R")      # 人口学特征表 → 文本
+source("tfl/02_t_adverse_events.R")   # AE 汇总表 → 文本
+source("tfl/03_g_km.R")               # KM 生存曲线 → PNG
 ```
 
 ::: {.callout-important}
@@ -249,9 +249,9 @@ SEX
 ──────────     ─────────    ──────────    ─────────────
 pharmaverseraw              pharmaverseadam
     │            │             │              │
-  ae_raw   →  sdtm/ae.R  →  adam/adae.R  →  tfl/t_adverse_events.R
-  dm_raw   →  sdtm/dm.R  →  adam/adsl.R  →  tfl/t_demographic.R
-                             adam/adtte.R →  tfl/g_km.R
+  ae_raw   →  sdtm/03_ae.R  →  adam/02_adae.R  →  tfl/02_t_adverse_events.R
+  dm_raw   →  sdtm/01_dm.R  →  adam/01_adsl.R  →  tfl/01_t_demographic.R
+                             adam/04_adtte.R →  tfl/03_g_km.R
 ```
 
 每一段都有对应 skill：`sdtm` → `adam` → `tfl`，全程中文对话驱动。

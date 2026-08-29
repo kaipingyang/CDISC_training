@@ -44,6 +44,6 @@ for (f in r_files) {
 cat(sprintf("\n✓ 练习区就绪：%s/\n", dst))
 cat("  子目录：sdtm/  adam/  tfl/（各含挖空 starter）\n\n")
 cat("开始练习：\n")
-cat(sprintf("  1. 打开 %s/sdtm/ae.R，按 # TODO 提示填空\n", dst))
+cat(sprintf("  1. 打开 %s/sdtm/03_ae.R，按 # TODO 提示填空\n", dst))
 cat("  2. 填不出就问 Claude Code：\"帮我补全这个 TODO\"（练习模式：只给提示，不读答案）\n")
-cat(sprintf("  3. 写完自查：跟 Claude Code 说\"我写完了，帮我对照检查\"，再对照 sdtm/ae.R（完整版，别改它）\n\n"))
+cat(sprintf("  3. 写完自查：跟 Claude Code 说\"我写完了，帮我对照检查\"，再对照 sdtm/03_ae.R（完整版，别改它）\n\n"))
