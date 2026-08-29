@@ -3,7 +3,7 @@
     "Version": "4.6.1",
     "Repositories": [
       {
-        "Name": "TUNA",
+        "Name": "CRAN",
         "URL": "https://mirrors.tuna.tsinghua.edu.cn/CRAN"
       }
     ]
