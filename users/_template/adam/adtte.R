@@ -19,7 +19,7 @@
 #   - metadata/onco_spec.xlsx     : ADTTE 规格书
 #
 # 输出文件：
-#   - adtte.xpt（SAS 传输文件，写入 adam/output/）
+#   - adtte.xpt（SAS 传输文件，写入 users/<STUDENT_NAME>/adam/output/）
 #
 # 关键概念说明：
 #   生存分析核心概念：
@@ -209,6 +209,6 @@ adtte_final <- adtte_adsl_checked %>%
 
 # Write dataset to XPT file (optional)
 # 导出为 SAS 传输文件（.xpt），用于统计分析软件（SAS/R）读取
-dir <- "adam/output"
+dir <- "users/<STUDENT_NAME>/adam/output"
 dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 xportr_write(adtte_final, file.path(dir, "adtte.xpt"))

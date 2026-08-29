@@ -35,6 +35,11 @@ Rscript users/setup.R <名字>
 这会把 `users/_template/` 的挖空 starter（sdtm/adam/tfl 三个子目录）复制到
 `users/<名字>/`。脚本用 `overwrite = FALSE`，重跑不会冲掉学员已填的内容。
 
+模板里的输出路径带 `<STUDENT_NAME>` 占位符（如 `users/<STUDENT_NAME>/sdtm/output`），
+setup.R 复制后自动替换为学员名——产物写进学员自己的目录，**不会覆盖根目录
+`sdtm/output/`、`adam/output/` 的答案产物**。若发现某学员目录里的路径仍是
+`<STUDENT_NAME>`（旧模板复制残留），手动替换成该学员名即可。
+
 ### Step 3 — 告诉学员怎么开始
 
 初始化成功后，告诉学员：

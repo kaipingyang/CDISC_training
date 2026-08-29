@@ -31,6 +31,16 @@ copied <- file.copy(
   overwrite = FALSE
 )
 
+# 把模板里的 <STUDENT_NAME> 占位符替换为学员名（输出路径定位到学员自己的目录，
+# 避免学员从项目根运行脚本时产物写进根目录 sdtm/output、adam/output 覆盖答案产物）
+r_files <- list.files(dst, pattern = "\\.R$", recursive = TRUE, full.names = TRUE)
+for (f in r_files) {
+  lines <- readLines(f, warn = FALSE)
+  if (any(grepl("<STUDENT_NAME>", lines, fixed = TRUE))) {
+    writeLines(gsub("<STUDENT_NAME>", user, lines, fixed = TRUE), f)
+  }
+}
+
 cat(sprintf("\n✓ 练习区就绪：%s/\n", dst))
 cat("  子目录：sdtm/  adam/  tfl/（各含挖空 starter）\n\n")
 cat("开始练习：\n")

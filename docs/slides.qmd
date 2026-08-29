@@ -25,11 +25,14 @@ lang: zh
 
 ## 今天的旅程
 
-**目标**：不用从零学 R，用 **Claude Code + skill**，用自然语言驱动生成符合 CDISC 规范的临床数据集。
+**目标**：不用从零学 R，用 **Claude Code + skill**，用自然语言驱动生成符合规范的临床数据集。
+
+**本课用行业真实标准当例子，但你不需要懂标准本身——记住三个词**：
+**标准数据表（SDTM）** → **分析数据（ADaM）** → **报告图表（TFL）**。
 
 ![](images/roadmap.svg){width="80%" fig-align="center" fig-alt="从原始数据到 SDTM 到 ADaM 到 TFL 的流水线"}
 
-**两个课时**：课时 1 = Claude Code 上手 + 生成 **SDTM**；课时 2 = 生成 **ADaM** + **TFL**
+**两个课时**：课时 1 = Claude Code 上手 + 生成**标准数据表**；课时 2 = 生成**分析数据 + 报告图表**
 
 ## 我们用什么工具
 
@@ -45,22 +48,6 @@ lang: zh
 + 官方参考层（`admiral` 家族、`sdtm-oak`，来自 R Consortium pharma-skills）。
 用自然语言描述需求，对应 skill 自动加载，按 CDISC 标准生成可运行代码。
 :::
-
-## 什么是 CDISC
-
-**CDISC**：临床数据交换标准协会制定的**数据标准体系**。监管机构（FDA/EMA）要求
-提交的临床试验数据遵循统一格式 —— 不标准的数据无法评审。
-
-**数据流水线的四个层次**：
-
-| 层次 | 是什么 | 例子 |
-|------|--------|------|
-| **原始数据（EDC）** | 医院/研究中心采集的病例数据 | "Recovered/Resolved"、"Mild" |
-| **SDTM** | 整理成规范表格式的原始数据 | 大写 + 受控术语（AESEV="MILD"） |
-| **ADaM** | 可直接统计分析的分析数据集 | 生存时间、治疗期标志 |
-| **TFL** | 报告交付物：表格/图/清单 | 人口学表、KM 曲线 |
-
-**CDISCPILOT01**：CDISC 官方 Pilot 项目发布的公开示例研究数据（pharmaverse 各包内置其副本），本课全程使用。
 
 # 课时 1：用 Claude Code 生成 SDTM {.center}
 
@@ -79,6 +66,30 @@ lang: zh
 ::: {.callout-tip}
 你不用记 R 语法。你要做的是**说清楚要什么**（哪个域、什么变量、什么规则），
 再**看懂 AI 在做什么**，让它反复改到对。
+:::
+
+## skill 是怎么来的、长什么样
+
+**skill = 把领域经验打包成"说明书"**：Claude 读到说明书，就按里面的套路干活。
+
+**一个 skill 的结构**（以 `sdtm-map` 为例）：
+
+```text
+sdtm-map/
+├── SKILL.md        ← 说明书：什么时候触发 + 怎么用 + 代码模板
+└── references/     ← 资料：函数速查、常见坑记录
+```
+
+**它怎么一步步设计出来的**：
+
+1. **收集** —— 学员常问的问题（"怎么把 `IT.SEX` 变成 `SEX`？"）
+2. **提炼** —— 归纳成"域映射套路"：选函数（`assign_no_ct` / `assign_ct` / `hardcode_ct`）→ 填参数
+3. **成文** —— 写进 SKILL.md：触发词（"生成 DM 域"）+ 可运行模板
+4. **实测** —— 跑通模板，确认产出合规
+5. **回填** —— 实战踩的坑记进 references，下次自动避开
+
+::: {.callout-note}
+你不需要会写 skill —— 但看懂结构后，就明白为什么说"生成 DM 域"会自动加载 `sdtm-map`。
 :::
 
 ## Claude Code 基础操作
@@ -137,8 +148,8 @@ result <- data %>%                                  # <- 赋值：结果存到 r
 
 ## 什么是 SDTM
 
-**SDTM**（Study Data Tabulation Model）：把 EDC 采集的**原始数据**，按 CDISC 规定
-**重命名、标准化**成监管提交用的规范格式。数据按**域（Domain）**组织：DM / VS / AE……
+**SDTM**（标准数据表）：把 EDC 采集的**原始数据**，整理成**统一格式**的表格——
+按**域（Domain）**组织：DM / VS / AE……（本课全程生成的就是这种表）
 
 **三种映射动作**（sdtm.oak）：
 
@@ -293,7 +304,7 @@ ae <- ae_raw %>%
 
 ## 什么是 ADaM
 
-**ADaM**（Analysis Data Model）：在 SDTM 基础上进一步加工成**可直接统计分析**的数据集。
+**ADaM**（分析数据）：在标准数据表（SDTM）基础上进一步加工成**能直接算统计、画图**的数据。
 
 先看真实 ADSL 数据（每个受试者一行）：
 
@@ -355,7 +366,7 @@ adae <- ae %>%
 
 ## 从 ADaM 到 TFL：Layout 与 Data 分离
 
-**TFL**（Tables / Figures / Listings）：临床报告最终交付物。技术栈 `rtables`（布局）+ `tern`（临床封装，主要调这层）。
+**TFL**（报告图表）：最终交付的**表格 / 图形 / 清单**。技术栈 `rtables`（布局）+ `tern`（临床封装，主要调这层）。
 
 :::: {.columns}
 

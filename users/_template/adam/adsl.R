@@ -24,7 +24,7 @@
 #   - metadata/safety_specs.xlsx : ADaM 规格书（定义变量、受控术语、排序等）
 #
 # 输出文件：
-#   - adsl.xpt（SAS 传输文件，写入 adam/output/）
+#   - adsl.xpt（SAS 传输文件，写入 users/<STUDENT_NAME>/adam/output/）
 #
 # 关键概念说明：
 #   ADSL 是所有 ADaM 分析的起点，包含以下关键变量类别：
@@ -403,7 +403,7 @@ adsl <- adsl %>%
 # order_cols      : 按规格书定义的变量顺序排列列
 # sort_by_key     : 按规格书定义的排序键排列行
 # xportr_*        : 设置 SAS 格式（类型、长度、标签）并导出为 .xpt 文件
-dir <- "adam/output" # Specify the directory for saving the XPT file
+dir <- "users/<STUDENT_NAME>/adam/output" # Specify the directory for saving the XPT file
 dir.create(dir, showWarnings = FALSE, recursive = TRUE)
 
 adsl %>%
