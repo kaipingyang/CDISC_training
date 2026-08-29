@@ -118,7 +118,7 @@ sdtm-map/
 |------|---------|------|
 | **① 对话生成** | "帮我生成 DM 域的 SDTM 映射代码" | 从零起一个脚本 |
 | **② 显式喊 skill** | "用 sdtm-map skill 做 VS 域" | 关键词没自动触发时 |
-| **③ 文件引用** | "参考我写好的 `users/我的名字/sdtm/dm.R` 帮我写 VS 域" | 让 AI 照已有脚本仿写 |
+| **③ 文件引用** | "参考我写好的 `users/我的名字/sdtm/01_dm.R` 帮我写 VS 域" | 让 AI 照已有脚本仿写 |
 | **④ 迭代修改** | "把导出路径改成 output 目录" | 生成后继续调 |
 | **⑤ 解释 + 排错** | "解释这段 `assign_ct`" / "跑报错了，帮我修" | 看懂代码、AI 读报错自动 debug |
 
@@ -231,7 +231,7 @@ dm <- dm_raw %>%
 ## 运行与产物
 
 ```r
-source("sdtm/dm.R")   # 生成 DM 域，导出 dm.xpt
+source("sdtm/01_dm.R")   # 生成 DM 域，导出 dm.xpt
 ```
 
 **产物**：符合 SDTM 规范的 DM 数据集（每人一行），导出为 `dm.xpt` 到 `sdtm/output/`。
@@ -263,7 +263,7 @@ vs <- vs_raw %>%
 
 ::: {.callout-tip}
 不会写就问 Claude Code，但要约定"**给提示不给答案**"：
-"帮我补全这两个 TODO，先提示思路，别直接给完整代码，也别读 `sdtm/vs.R`"。练完再对照 `sdtm/vs.R` 自查。
+"帮我补全这两个 TODO，先提示思路，别直接给完整代码，也别读 `sdtm/02_vs.R`"。练完再对照 `sdtm/02_vs.R` 自查。
 :::
 
 ## 进阶：生成 AE 域（复杂域）
@@ -284,7 +284,7 @@ ae <- ae_raw %>%
 ```
 
 ::: {.callout-note}
-完整实现见 `sdtm/ae.R`（含 SUPPAE），练完再对照。先练熟 DM 和 VS，再挑战这个域。
+完整实现见 `sdtm/03_ae.R`（含 SUPPAE），练完再对照。先练熟 DM 和 VS，再挑战这个域。
 :::
 
 ## 课时 1 小结
@@ -400,9 +400,9 @@ tbl <- build_table(lyt, df = adsl)
 
 | 你说 | 生成 | 难度 |
 |------|------|------|
-| "做人口学特征表，按治疗组分列" | `t_demographic.R` | 入门（ADSL 单表） |
-| "AE 汇总表，按 SOC 和 PT 统计发生率" | `t_adverse_events.R` | 中级（ADAE+ADSL 分母） |
-| "画总生存期 OS 的 KM 生存曲线" | `g_km.R` | 进阶（表→图） |
+| "做人口学特征表，按治疗组分列" | `01_t_demographic.R` | 入门（ADSL 单表） |
+| "AE 汇总表，按 SOC 和 PT 统计发生率" | `02_t_adverse_events.R` | 中级（ADAE+ADSL 分母） |
+| "画总生存期 OS 的 KM 生存曲线" | `03_g_km.R` | 进阶（表→图） |
 
 **下面的三张产物都是真实运行结果**（`rtables::as_html` 直接渲染，不是示意图）：
 
@@ -471,7 +471,7 @@ tern::g_km(
 )
 ```
 
-`tern::g_km()` 返回 **ggplot 对象**，幻灯片里直接渲染 —— 与 `tfl/g_km.R` 完全同源。
+`tern::g_km()` 返回 **ggplot 对象**，幻灯片里直接渲染 —— 与 `tfl/03_g_km.R` 完全同源。
 
 ## 动手练习：改成 PFS 曲线 {background-opacity="0.04"}
 
@@ -561,9 +561,9 @@ Claude Code 里说"用 teal 搭交互 TFL 展示"（会触发 `teal-clinical-mod
 
 ```r
 renv::restore()                # 恢复环境
-source("sdtm/dm.R")            # SDTM：从最基础的 DM 域开始
-source("adam/adsl.R")          # ADaM
-source("tfl/t_demographic.R")  # TFL
+source("sdtm/01_dm.R")            # SDTM：从最基础的 DM 域开始
+source("adam/01_adsl.R")          # ADaM
+source("tfl/01_t_demographic.R")  # TFL
 ```
 
 **或者，直接在 Claude Code 里用中文说出你要的数据集。**

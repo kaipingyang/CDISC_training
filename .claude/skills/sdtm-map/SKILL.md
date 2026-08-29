@@ -406,7 +406,7 @@ SDTM 映射完成后，提示用户：
     assign_no_ct(raw_dat = ec_raw, raw_var = "DRUGAD", tgt_var = "EXTRT", ...)
   ```
 
-  参考：`users/zhangsan/sdtm/ex.R`。管道里要用原始列时，从外层对象取
+  参考：`users/zhangsan/sdtm/05_ex.R`。管道里要用原始列时，从外层对象取
   （`ec_raw[["IT.ECDSTXT"]]`），不要指望 tgt_dat 里还有原始列。
 
 ### 坑 2：hardcode_ct / assign_ct 的 codelist 必须先查 CT 表
@@ -495,9 +495,9 @@ getwd()  # 显示当前工作目录
 
 如果项目目录中已有以下文件，优先参考这些完整示例：
 
-- `sdtm/dm.R` — DM 域（人口学）完整映射脚本
-- `sdtm/ae.R` — AE 域（不良事件）完整映射脚本
-- `sdtm/vs.R` — VS 域（生命体征）完整映射脚本
+- `sdtm/01_dm.R` — DM 域（人口学）完整映射脚本
+- `sdtm/03_ae.R` — AE 域（不良事件）完整映射脚本
+- `sdtm/02_vs.R` — VS 域（生命体征）完整映射脚本
 
 这些脚本包含实际项目的变量映射逻辑，比上面的模板更贴近你的数据结构。
 

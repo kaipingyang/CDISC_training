@@ -260,7 +260,7 @@ adsl |> summarise(
                     source_var = AVAL, new_var = BASE, filter = ABLFL == "Y")
   ```
 
-  参考：`users/zhangsan/adam/adlb.R`、`users/zhangsan/adam/adeg.R`。
+  参考：`users/zhangsan/adam/05_adlb.R`、`users/zhangsan/adam/06_adeg.R`。
 
 ### 坑 2：BDS 序号 order 必须保证组内唯一
 
@@ -294,7 +294,7 @@ adsl |> summarise(
     )
   ```
 
-  参考：`users/zhangsan/adam/adtte.R`、admiralonco 官方模板 `ad_adtte.R`。
+  参考：`users/zhangsan/adam/04_adtte.R`、admiralonco 官方模板 `ad_adtte.R`。
 
 ---
 
@@ -328,10 +328,10 @@ A：使用 `derive_vars_period()` 函数，admiral 文档中有专门的 vignett
 ## 项目本地脚本参考
 
 项目中已有完整实现脚本，可作为参考：
-- `adam/adsl.R` - ADSL 完整示例
-- `adam/adae.R` - ADAE 完整示例
-- `adam/advs.R` - ADVS 完整示例
-- `adam/adtte.R` - ADTTE 完整示例
+- `adam/01_adsl.R` - ADSL 完整示例
+- `adam/02_adae.R` - ADAE 完整示例
+- `adam/03_advs.R` - ADVS 完整示例
+- `adam/04_adtte.R` - ADTTE 完整示例
 
 如果本地脚本与模板有差异，以本地脚本为准——它已针对项目实际 SDTM 结构做了调整。
 

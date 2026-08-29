@@ -84,8 +84,8 @@ Rscript users/setup.R zhangsan     # 换成你的拼音名
 
 或在 Claude Code 里说 **"帮我创建练习区"**（触发 `new-user` skill，它会问你名字并初始化）。
 
-初始化后：打开 `users/<你的名字>/sdtm/ae.R` 按 `# TODO` 填空 → 填不出问 Claude Code
-"帮我补全这个 TODO" → 跑通后对照 `sdtm/ae.R` 答案。学员目录不入库，是你的私有副本。
+初始化后：打开 `users/<你的名字>/sdtm/03_ae.R` 按 `# TODO` 填空 → 填不出问 Claude Code
+"帮我补全这个 TODO" → 跑通后对照 `sdtm/03_ae.R` 答案。学员目录不入库，是你的私有副本。
 
 ---
 
@@ -112,10 +112,10 @@ renv 会读取 `renv.lock` 中记录的精确版本，确保环境完全一致�
 以下几个差异是**有意设计或数据源差异**，非脚本错误：
 
 - **`metadata/sdtm_ct.csv` 的 VISITNUM 对照表整体错位**（如 WEEK 2 应为 4 而非 5）：
-  `sdtm/ds.R`、`sdtm/ex.R`（以及既有的 `sdtm/vs.R`）不使用该表映射 VISITNUM，
+  `sdtm/04_ds.R`、`sdtm/05_ex.R`（以及既有的 `sdtm/02_vs.R`）不使用该表映射 VISITNUM，
   而是脚本内置查表（BSL=3、WEEK N=N+2、AMBUL 3.5、RETRIEVAL=201、UNSCHEDULED 小数），
   与官方口径一致。
-- **DS 的 DSSPID**：原始 EDC（`ds_raw`）未采集赞助商定义的处置标识，`sdtm/ds.R` 恒为缺失；
+- **DS 的 DSSPID**：原始 EDC（`ds_raw`）未采集赞助商定义的处置标识，`sdtm/04_ds.R` 恒为缺失；
   官方数据有 95 行非空（无法从 raw 重建，差异记录留档）。
 - **ADLB 的 CALCULATION 行**：官方 AGDA 另有 24 行 DTYPE="CALCULATION" 的复核值
   （BASO/LYMPH 由 WBC×占比重算），答案脚本以 SDTM 标准化结果为最终值，不重现该行；
@@ -134,9 +134,9 @@ renv 会读取 `renv.lock` 中记录的精确版本，确保环境完全一致�
 **方式一：直接运行参考脚本**
 
 ```r
-source("sdtm/dm.R")   # DM 域（人口学）
-source("sdtm/ae.R")   # AE 域（不良事件）
-source("sdtm/vs.R")   # VS 域（生命体征）
+source("sdtm/01_dm.R")   # DM 域（人口学）
+source("sdtm/03_ae.R")   # AE 域（不良事件）
+source("sdtm/02_vs.R")   # VS 域（生命体征）
 ```
 
 **方式二：在 Claude Code 中用自然语言触发 `sdtm-domain` skill**
@@ -157,13 +157,13 @@ ADaM 数据集在 SDTM 基础上进一步加工为分析用数据集：
 **方式一：直接运行参考脚本**
 
 ```r
-source("adam/adsl.R")   # ADSL（受试者级数据集，所有 ADaM 的基础）
-source("adam/adae.R")   # ADAE（不良事件分析数据集）
-source("adam/advs.R")   # ADVS（生命体征分析数据集）
-source("adam/adtte.R")  # ADTTE（生存分析数据集）
+source("adam/01_adsl.R")   # ADSL（受试者级数据集，所有 ADaM 的基础）
+source("adam/02_adae.R")   # ADAE（不良事件分析数据集）
+source("adam/03_advs.R")   # ADVS（生命体征分析数据集）
+source("adam/04_adtte.R")  # ADTTE（生存分析数据集）
 ```
 
-> 建议先运行 `adsl.R`，因为其他 ADaM 数据集均依赖 ADSL。
+> 建议先运行 `01_adsl.R`，因为其他 ADaM 数据集均依赖 ADSL。
 
 **方式二：在 Claude Code 中用自然语言触发 `adam-domain` skill**
 
@@ -182,9 +182,9 @@ TFL（Tables/Figures/Listings）是临床研究报告的最终交付物，建立
 **方式一：直接运行参考脚本**
 
 ```r
-source("tfl/t_demographic.R")      # 人口学特征表（入门主线，ADSL 单表）
-source("tfl/t_adverse_events.R")   # AE 汇总表（ADAE + ADSL，含分母逻辑）
-source("tfl/g_km.R")               # KM 生存曲线图（ADTTE）
+source("tfl/01_t_demographic.R")      # 人口学特征表（入门主线，ADSL 单表）
+source("tfl/02_t_adverse_events.R")   # AE 汇总表（ADAE + ADSL，含分母逻辑）
+source("tfl/03_g_km.R")               # KM 生存曲线图（ADTTE）
 ```
 
 > 三个示例难度递增：人口学表 → AE 表 → KM 图，覆盖"表"与"图"两大类。

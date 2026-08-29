@@ -44,13 +44,15 @@ setup.R 复制后自动替换为学员名——产物写进学员自己的目录
 
 初始化成功后，告诉学员：
 
-1. **打开** `users/<名字>/sdtm/ae.R`，按文件里的 `# TODO` 提示填空
+1. **打开** `users/<名字>/sdtm/03_ae.R`，按文件里的 `# TODO` 提示填空
 2. **填不出**就直接问 Claude Code："帮我补全这个 TODO"，或"解释这段在做什么"
 3. **跑通后对照答案**：跟 Claude Code 说"我写完了，帮我对照检查"（检查模式），
-   或自己打开项目根的 `sdtm/ae.R` 对比（完整版，**别改答案文件**）
-4. 建议顺序：先 SDTM（`sdtm/ae.R` → `dm.R` → `vs.R`），
-   再 ADaM（`adam/adsl.R` → `adae.R` → `advs.R`，`adtte.R` 为进阶可选），
-   最后 TFL（`tfl/` 三个）
+   或自己打开项目根的 `sdtm/03_ae.R` 对比（完整版，**别改答案文件**）
+4. 建议顺序（文件编号即顺序，由易到难）：
+   先 SDTM（`sdtm/01_dm.R` → `02_vs.R` → `03_ae.R`；`04_ds.R`/`05_ex.R` 进阶可选），
+   再 ADaM（`adam/01_adsl.R` → `02_adae.R` → `03_advs.R`；`04_adtte.R`、`05_adlb.R`/`06_adeg.R`/`07_adcm.R` 进阶可选），
+   最后 TFL（`tfl/01_t_demographic.R` → `02_t_adverse_events.R` → `03_g_km.R`；
+   `04_t_vitals.R`/`05_t_lab.R`/`06_g_km_pfs.R` 进阶可选）
 
 ## 铁律
 
