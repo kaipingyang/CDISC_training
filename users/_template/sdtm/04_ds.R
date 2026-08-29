@@ -53,7 +53,8 @@ ds <- ds_raw %>%
     id_vars = oak_id_vars()
   ) %>%
   # TODO 1: 补全 DSTERM/DSDECOD —— 统一为大写，且缺失时用 OTHERSP 兜底
-  #   提示：toupper(ifelse(is.na(DSTERM), OTHERSP, DSTERM))——DSTERM 列在上一步 assign_no_ct 已生成
+  #   提示：DSTERM = toupper(ifelse(is.na(DSTERM), OTHERSP, DSTERM))——DSTERM 列在上一步 assign_no_ct 已生成；
+  #   DSDECOD 同样处理（toupper(ifelse(is.na(DSDECOD), OTHERSP, DSDECOD))），两列一起放一个 mutate 里
   # 👉 在这里补一段 dplyr::mutate(...)，参考下面 DSCAT 的 case_when 写法
   identity() %>%
   # VISIT：直接取原始访视名大写（官方口径 = INSTANCE 大写）
@@ -66,9 +67,10 @@ ds <- ds_raw %>%
   dplyr::mutate(DSCAT = NA_character_) %>% # 占位：填好 TODO 后删除本行
   # TODO 3: 派生 VISITNUM。为什么不用 assign_ct？—— metadata 的 VISITNUM 对照表
   #   整体错位（WEEK 2 应为 4 而非 5），官方口径是内置查表：
-  #   BASELINE=3、WEEK 2=4、WEEK 4=5…WEEK 26=13、AMBUL ECG PLACEMENT=3.5、RETRIEVAL=201、
-  #   非计划访视（UNSCHEDULED 1.1 等）= 后缀小数
-  #   提示：c("BASELINE"=3, "WEEK 2"=4, ...)[VISIT] 取值 + unname()；UNSCHEDULED 用 sub() 截小数
+  #   SCREENING 1=1、BASELINE=3、WEEK 2=4、WEEK 4=5…WEEK 26=13、AMBUL ECG REMOVAL=6、
+  #   RETRIEVAL=201、非计划访视（UNSCHEDULED 1.1 等）= 后缀小数
+  #   （注意：数据里只有 AMBUL ECG REMOVAL，没有 PLACEMENT；SCREENING 1 别漏，否则查表取 NA）
+  #   提示：c("SCREENING 1"=1, "BASELINE"=3, ...)[VISIT] 取值 + unname()；UNSCHEDULED 用 sub() 截小数
   # 👉 在这里补一段 dplyr::mutate(VISITNUM = dplyr::if_else(...))
   identity() %>%
   # TODO 4: 派生 DSDTC（处置记录日期，含时间部分）

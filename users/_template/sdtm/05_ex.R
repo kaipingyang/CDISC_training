@@ -102,12 +102,14 @@ ex <- ec_raw %>%
   # 👉 在这里补一段 mutate(...)
   identity() %>%
   # TODO 2: 派生 VISITNUM 与 VISITDY（官方口径）
-  #   查表：BASELINE=3、WEEK 2=4…WEEK 26=13、AMBUL ECG PLACEMENT=3.5、RETRIEVAL=201、
+  #   查表：BASELINE=3、WEEK 2=4…WEEK 26=13、AMBUL ECG REMOVAL=6、RETRIEVAL=201、
   #   UNSCHEDULED 1.1=1.1（后缀小数）；VISITDY：BASELINE=1，Week N = N×7
+  #   （本练习 EX 数据只有 BASELINE / WEEK 2 / WEEK 24，查表务必覆盖 WEEK 24=12）
   #   （metadata 的 VISITNUM 对照表整体错位，勿用 assign_ct——与 ds.R 同一查表）
   #   提示：c("BASELINE"=3, "WEEK 2"=4, ...)[VISIT] 查表 + if_else + sub("^WEEK ",...)
-  # 👉 在这里补一段 mutate(...)
-  identity() %>%
+  # 👉 在这里补一段 mutate(...)；⚠️ 注意：这是本段管道的最后一步，结尾不要写 %>%（否则
+  #   管道悬空会把下面第二段的 `ex <- ex %>%` 吞进本链，运行报 "object 'ex' not found"）
+  identity()
   # EXDOSE 等原始列注意：assign_* 会丢弃未用原始列，需要的外层列从 ec_raw 取
 
 ## ----r------------------------------------------------------------------------
