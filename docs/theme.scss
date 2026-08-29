@@ -261,16 +261,17 @@ $presentation-block-margin: 12px;
   position: relative;
 }
 
-/* macOS 红绿蓝三点装饰 */
+/* macOS 红绿蓝三点装饰（用色标画点：circle 5px 位置参数写法在部分
+   浏览器会退化成全宽色带，改用色标半径 5px 即可稳定渲染圆点） */
 .reveal div.sourceCode::before {
   content: '';
   display: block;
   height: 32px;
-  background: linear-gradient(180deg, #EDEDEE 0%, #E5E5E6 100%);
   border-bottom: 1px solid rgba(0,0,0,0.07);
-  background-image: radial-gradient(circle 5px at 16px 50%, #FF5F57 0%, #FF5F57 100%),
-                    radial-gradient(circle 5px at 34px 50%, #FEBC2E 0%, #FEBC2E 100%),
-                    radial-gradient(circle 5px at 52px 50%, #28C840 0%, #28C840 100%);
+  background-image: radial-gradient(circle at 16px 16px, #FF5F57 0, #FF5F57 5px, transparent 5px),
+                    radial-gradient(circle at 34px 16px, #FEBC2E 0, #FEBC2E 5px, transparent 5px),
+                    radial-gradient(circle at 52px 16px, #28C840 0, #28C840 5px, transparent 5px),
+                    linear-gradient(180deg, #EDEDEE 0%, #E5E5E6 100%);
   background-repeat: no-repeat;
 }
 

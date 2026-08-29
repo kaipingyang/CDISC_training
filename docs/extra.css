@@ -34,12 +34,25 @@
   font-size: 14px !important;
 }
 
-/* 图片：quarto 自动给图片加 r-stretch（reveal 的自动拉伸），其高度计算有
-   时序问题（跳到某页时可能算出 height: 0 导致图片不显示）。改回按宽度
-   等比渲染，由 SVG 自带的固有尺寸决定高度，行为确定。 */
+/* 图片：quarto 自动给图片加 r-stretch（reveal 的自动拉伸），其高度计算依赖
+   图片解码完成的 naturalWidth/naturalHeight —— 解码前高度会先塌缩（height:0）
+   或过度膨胀，出现"跳到某页图消失/压住页脚"的时序问题。
+   统一规则：height 由 CSS aspect-ratio 锁定（不依赖解码状态），宽度按显示设定。
+   注意：embed-resources 会把图内联成 base64，src 匹配不上文件名，
+   因此用 qmd 里加的 class（.fig-*）选择。 */
 .reveal img.r-stretch {
   height: auto !important;
 }
+
+/* 各图显式宽高比（与源图一致，等宽时高度确定）。
+   宽度必须 !important 锁定：reveal 的 r-stretch JS 会在导航后把 inline
+   width 重写成 px（如 1285.71px），不锁的话图片在部分路径下会被拉大。 */
+.reveal img.fig-roadmap-80 { width: 80% !important; aspect-ratio: 1400 / 240; }
+.reveal img.fig-roadmap-92 { width: 92% !important; aspect-ratio: 1400 / 240; }
+.reveal img.fig-flow { width: 100% !important; aspect-ratio: 1400 / 240; }
+.reveal img.fig-hub { width: 72% !important; aspect-ratio: 1400 / 330; }
+.reveal img.fig-app { width: 100% !important; aspect-ratio: 1600 / 900; }
+.reveal img.fig-km { width: 62% !important; aspect-ratio: 10 / 7; }
 
 /* AE 汇总表（产物 2）：表格内容宽 1791px，超出容器 1600px 会产生横向滚动条。
    qmd 中已对该表用 scale(0.88) 缩放，这里让滚动容器不出现滚动条，

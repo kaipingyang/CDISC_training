@@ -30,9 +30,13 @@ lang: zh
 **本课用行业真实标准当例子，但你不需要懂标准本身——记住三个词**：
 **标准数据表（SDTM）** → **分析数据（ADaM）** → **报告图表（TFL）**。
 
-![](images/roadmap.svg){width="80%" fig-align="center" fig-alt="从原始数据到 SDTM 到 ADaM 到 TFL 的流水线"}
+![](images/roadmap.svg){.fig-roadmap-80 width="80%" fig-align="center" fig-alt="从原始数据到 SDTM 到 ADaM 到 TFL 的流水线"}
 
 **两个课时**：课时 1 = Claude Code 上手 + 生成**标准数据表**；课时 2 = 生成**分析数据 + 报告图表**
+
+::: {.callout-tip}
+课时 1 最后，我会告诉大家：**"说句话就能生成代码"的 skill 是怎么写出来的**——你们也能写。
+:::
 
 ## 我们用什么工具
 
@@ -66,30 +70,6 @@ lang: zh
 ::: {.callout-tip}
 你不用记 R 语法。你要做的是**说清楚要什么**（哪个域、什么变量、什么规则），
 再**看懂 AI 在做什么**，让它反复改到对。
-:::
-
-## skill 是怎么来的、长什么样
-
-**skill = 把领域经验打包成"说明书"**：Claude 读到说明书，就按里面的套路干活。
-
-**一个 skill 的结构**（以 `sdtm-map` 为例）：
-
-```text
-sdtm-map/
-├── SKILL.md        ← 说明书：什么时候触发 + 怎么用 + 代码模板
-└── references/     ← 资料：函数速查、常见坑记录
-```
-
-**它怎么一步步设计出来的**：
-
-1. **收集** —— 学员常问的问题（"怎么把 `IT.SEX` 变成 `SEX`？"）
-2. **提炼** —— 归纳成"域映射套路"：选函数（`assign_no_ct` / `assign_ct` / `hardcode_ct`）→ 填参数
-3. **成文** —— 写进 SKILL.md：触发词（"生成 DM 域"）+ 可运行模板
-4. **实测** —— 跑通模板，确认产出合规
-5. **回填** —— 实战踩的坑记进 references，下次自动避开
-
-::: {.callout-note}
-你不需要会写 skill —— 但看懂结构后，就明白为什么说"生成 DM 域"会自动加载 `sdtm-map`。
 :::
 
 ## Claude Code 基础操作
@@ -161,7 +141,7 @@ result <- data %>%                                  # <- 赋值：结果存到 r
 
 ## SDTM 映射流程总览
 
-![](images/sdtm_flow.svg){width="100%" fig-align="center" fig-alt="原始采集数据经三种映射动作变成 SDTM 域"}
+![](images/sdtm_flow.svg){.fig-flow width="100%" fig-align="center" fig-alt="原始采集数据经三种映射动作变成 SDTM 域"}
 
 **一条管道，三种动作**：每个原始字段按需走 `assign_no_ct`（原样复制）/ `assign_ct`（CT 转换）/ `hardcode_ct`（写常量），拼出标准域。
 
@@ -287,6 +267,25 @@ ae <- ae_raw %>%
 完整实现见 `sdtm/03_ae.R`（含 SUPPAE），练完再对照。先练熟 DM 和 VS，再挑战这个域。
 :::
 
+## skill 是从哪来的
+
+上一页那句"用 sdtm.oak 帮我生成 DM 域"——回应的不是万能通用 AI，而是一份**现成的说明书**。
+
+**手册正文的第一行就是触发词**（拿 `sdtm-map` 的 SKILL.md 开头给大家看）：
+
+```text
+name: sdtm-map
+description: 用 sdtm.oak 创建 SDTM 域映射代码…
+```
+
+**里面躺着的模板，就是你前面看到的 DM 域管道**——同样的 4 步套路，照着改参数就行。
+
+**所以它是怎么来的**：问题多问几次成"套路" → 套路写成模板+触发词（SKILL.md）→ 每次当场跑通→ 跑出问题就回填"常见坑"（今天练 VS 时的报错，就是它的第一批内容）。
+
+::: {.callout-note}
+**skill 越用越好用**——每次踩坑回填一次，下次就少坑一步。
+:::
+
 ## 课时 1 小结
 
 - **Claude Code 五个动作**：对话生成 / 喊 skill / 文件引用 / 迭代改 / 解释排错
@@ -300,7 +299,7 @@ ae <- ae_raw %>%
 
 *分析数据集 + 表格图形 · 60 分钟*
 
-![](images/adam_hub.svg){width="72%" fig-align="center" fig-alt="SDTM 域合并出 ADSL，ADSL 派生各 ADaM 并作为 TFL 百分比分母"}
+![](images/adam_hub.svg){.fig-hub width="72%" fig-align="center" fig-alt="SDTM 域合并出 ADSL，ADSL 派生各 ADaM 并作为 TFL 百分比分母"}
 
 ## 什么是 ADaM
 
@@ -455,23 +454,9 @@ rtables::as_html(head(tbl_ae, 8))
 
 ## 产物 3：KM 生存曲线图
 
-```{r}
-#| eval: TRUE
-#| echo: FALSE
-#| message: FALSE
-adtte <- pharmaverseadam::adtte_onco %>%
-  filter(PARAMCD == "OS") %>%
-  mutate(ARM = factor(ARM), is_event = (CNSR == 0))
-tern::g_km(
-  df = adtte,
-  variables = list(tte = "AVAL", is_event = "is_event", arm = "ARM"),
-  annot_surv_med = TRUE,
-  title = "Kaplan-Meier Plot of Overall Survival",
-  xlab = "Time (Days)", ylab = "Survival Probability"
-)
-```
+`tern::g_km()` 返回 **ggplot 对象**——下图与 `tfl/03_g_km.R` 完全同源（同样的数据与布局，存成 PNG 展示）：
 
-`tern::g_km()` 返回 **ggplot 对象**，幻灯片里直接渲染 —— 与 `tfl/03_g_km.R` 完全同源。
+![](images/km_os.png){.fig-km width="62%" fig-align="center" fig-alt="总生存期 KM 曲线：按治疗组分三组，标注中位生存时间和风险人数"}
 
 ## 动手练习：改成 PFS 曲线 {background-opacity="0.04"}
 
@@ -512,7 +497,7 @@ g_km(anl,
 
 ## 完整链条回顾 {.center}
 
-![](images/roadmap.svg){width="92%" fig-alt="原始数据 → SDTM → ADaM → TFL 流水线，每段对应一个 skill"}
+![](images/roadmap.svg){.fig-roadmap-92 width="92%" fig-alt="原始数据 → SDTM → ADaM → TFL 流水线，每段对应一个 skill"}
 
 **每一段都有对应 skill**：`sdtm` → `adam` → `tfl`，全程中文对话驱动。
 
@@ -520,7 +505,7 @@ g_km(anl,
 
 :::: {.columns}
 
-::: {.column width="45%"}
+::: {.column width="42%"}
 数据和 TFL 都有了 —— 想让它们**可交互探索**（动态筛选、切换参数）？
 
 **pharmaverse 的 `teal` 框架**：把 tern/rtables 的输出包装成 Shiny 交互应用。
@@ -533,8 +518,8 @@ Claude Code 里说"用 teal 搭交互 TFL 展示"（会触发 `teal-clinical-mod
 :::
 :::
 
-::: {.column width="55%"}
-![](images/app.png){width="100%" fig-align="center" fig-alt="teal 交互 app 的人口学特征表模块：左侧参数面板、右侧统计表"}
+::: {.column width="58%"}
+![](images/app.png){.fig-app width="100%" fig-align="center" fig-alt="teal 交互 app 的人口学特征表模块：左侧参数面板、右侧统计表"}
 :::
 
 ::::

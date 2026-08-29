@@ -72,7 +72,7 @@
   </g>
 
   <!-- 箭头标注 -->
-  <g fill="#8E8E93" font-size="15" text-anchor="middle">
+  <g fill="#6E6E73" font-size="15" text-anchor="middle">
     <text x="297" y="42">合并治疗日期</text>
     <text x="297" y="128">合并受试者级变量</text>
   </g>
