@@ -142,6 +142,10 @@ adeg <- derive_vars_merged(
 
 ## ----r------------------------------------------------------------------------
 # 派生摘要记录：每个受试者/参数/访视的均值行（DTYPE="AVERAGE"）
+# ⚠ 口径说明（对照官方数据前必读）：本课 AVERAGE 按"体位时间点"汇总（ATPTN 815/816/817
+#   各一条，每日期 3 条）；官方 pharmaverseadam::adeg 按访视汇总（每日期 1 条），
+#   故总行数与 CHG 统计范围不同（本课 117053 行 vs 官方 78756 行）——属预期差异，
+#   课程有意保留体位信息便于讲解均值行派生。原始/派生参数行数与官方一致（59597 行）。
 adeg <- derive_summary_records(
   dataset = adeg,
   dataset_add = adeg,
@@ -154,10 +158,16 @@ adeg <- derive_summary_records(
 )
 
 ## ----r------------------------------------------------------------------------
-# 基线类型（BASETYPE）：本数据集为 "BASELINE DAY 1"（基期访视 = 用药前 Day 1）
+# 基线类型（BASETYPE）：单一基线类型（与 05_adlb 的 exprs("LAST" = TRUE) 同理，全行覆盖）
+# ⚠ 要点 1：derive_basetype_records 的"无基线"分支会丢弃条件算出 NA 的行——条件必须
+#   对每行都返回 TRUE/FALSE，直接写 TRUE 最稳（AVERAGE/非编号访视行一个都不会丢）。
+# ⚠ 要点 2：BASETYPE 只负责把记录归入"基线参照组"（BASE 按 USUBJID/PARAMCD/BASETYPE 回填，
+#   全行同组 Week 行才拿得到 BASE 派生 CHG）；真正的"哪条是基线"由下方 ABLFL 的
+#   filter（用药前）+ order（最后一条）决定。若只把 AVISITN==0 行标为基线类型，
+#   Week 等后续访视行的 BASE/CHG 将永远派生不出来。
 adeg <- derive_basetype_records(
   dataset = adeg,
-  basetypes = exprs("BASELINE DAY 1" = AVISITN == 0)
+  basetypes = exprs("BASELINE DAY 1" = TRUE)
 )
 
 ## ----r------------------------------------------------------------------------
@@ -218,11 +228,16 @@ adeg <- adeg %>%
 
 ## ----r------------------------------------------------------------------------
 # 派生分析序号 ASEQ（每个受试者内的记录序号）
+# ⚠ order 列必须能逐行区分记录：同一受试者同一日期有多条 AVERAGE 均值行
+#   （按体位时间点 ATPTN 区分，本数据每日期 3 条）；同一受试者同一天可能完成
+#   多场访视（如 SCREENING 1 与 2 同日）——原始记录按 EGSEQ 区分，其派生参数行
+#   （QTc/RRR 不携带 EGSEQ）按 VISIT 区分。order 缺区分列时 check_type="error"
+#   会报 "duplicate records" 错误——补上 ATPTN、VISIT、EGSEQ 即可。
 adeg <- derive_var_obs_number(
   adeg,
   new_var = ASEQ,
   by_vars = exprs(STUDYID, USUBJID),
-  order = exprs(PARAMCD, ADT, AVISITN, EGTPTNUM, DTYPE),
+  order = exprs(PARAMCD, ADT, VISIT, AVISITN, EGTPTNUM, DTYPE, ATPTN, EGSEQ),
   check_type = "error"
 )
 

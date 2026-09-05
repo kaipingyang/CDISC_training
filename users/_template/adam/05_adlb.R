@@ -70,6 +70,9 @@ adlb <- adlb %>%
 ## ----r------------------------------------------------------------------------
 # 创建分析访视变量 AVISIT/AVISITN
 # AVISIT：原始访视名转标题大小写；AVISITN：基线访视编号 3 转 0，其余保留
+# ⚠ 口径说明（对照官方数据前必读）：本课把 VISITNUM==3（BASELINE）定为基线（AVISITN=0），
+#   因此 SCREENING 1 落入 AVISITN=1 且会派生 CHG；官方 pharmaverseadam::adlb 口径相反——
+#   SCREENING 1 是基线（AVISITN=0），基线行不派生 CHG。两套口径下 CHG 范围不同，属预期差异。
 adlb <- adlb %>%
   mutate(
     AVISIT = str_to_title(VISIT),
