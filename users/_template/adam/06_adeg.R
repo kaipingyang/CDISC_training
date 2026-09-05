@@ -215,6 +215,8 @@ adeg <- restrict_derivation(
 #   CHGCAT1 ：<= 30 / >30<=60 / >60 ms（CHGCAT1N=1/2/3）
 #   用 derive_vars_cat(definition = exprs(~PARAMCD, ~condition, ...), by_vars=exprs(PARAMCD))
 #   注意 condition 中 AVAL 要用 PARAMCD=="QT" 限定
+#   分档文本逐字写"<= 450 ms" / ">450<=480 ms" / ">480<=500 ms" / ">500 ms"（CHGCAT1 同理
+#   "<= 30 ms" / ">30<=60 ms" / ">60 ms"）——与官方 pharmaverseadam::adeg 及根答案一致，勿自创措辞。
 # 👉 在这里补两段 derive_vars_cat(...)
 adeg <- adeg
 

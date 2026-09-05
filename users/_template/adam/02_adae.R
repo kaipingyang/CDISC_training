@@ -168,6 +168,10 @@ adae <- adae %>%
   #     - start_date     = ASTDT，end_date = AENDT
   #     - trt_start_date = TRTSDT，trt_end_date = TRTEDT
   # 👉 在这里补一段 derive_var_trtemfl(...)
+  # ⚠ 口径说明（对照官方数据前必读）：按本环境 admiral 1.5.0 的 derive_var_trtemfl 直接派生，
+  #   得 TRTEMFL="Y" 1126 行；官方 pharmaverseadam::adae 内置数据（旧版口径）为 1122 行——
+  #   差异集中在同一受试者的 4 条"治疗结束后才开始"的 AE：现行函数宽口径标 Y，官方标缺失，
+  #   属工具版本口径差，非代码错误。想逐行对齐官方可在派生后自行过滤 ASTDT > TRTEDT 的行（本课不要求）。
   identity() %>%   # 占位：填好上面 TODO 后删掉这行 identity() %>%
   derive_var_ontrtfl(
     start_date = ASTDT,
